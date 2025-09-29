@@ -22,15 +22,6 @@ const formSchema = z.object({
   password: z.string().min(1, { message: 'La contraseña es requerida.' }),
 });
 
-// Mock user data - in a real app, this would come from a database
-const users = [
-    {
-        email: 'user@example.com',
-        password: 'password123',
-        fullName: 'Usuario de Prueba'
-    }
-];
-
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
@@ -44,25 +35,37 @@ export function SignInForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In-memory user check
-    const userInDb = users.find(u => u.email === values.email);
-    
-    if (userInDb && userInDb.password === values.password) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // This is a mock login. In a real app, you'd call an API.
+    if (values.email === 'user@example.com' && values.password === 'password123') {
+        // Simulate setting a session for mock purposes
+        document.cookie = "session=true; path=/";
         toast({
             title: 'Inicio de sesión exitoso',
-            description: `¡Bienvenido de nuevo, ${userInDb.fullName}!`,
+            description: `¡Bienvenido de nuevo!`,
         });
-        // Simulate setting a session and redirect
-        // In a real app, you'd set a session cookie here
-        localStorage.setItem('session', JSON.stringify({ loggedIn: true, user: userInDb }));
         router.push('/');
-        router.refresh(); // Force a refresh to re-evaluate the layout
+        router.refresh();
     } else {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            if(user.email === values.email && user.password === values.password) {
+                document.cookie = "session=true; path=/";
+                toast({
+                    title: 'Inicio de sesión exitoso',
+                    description: `¡Bienvenido de nuevo!`,
+                });
+                router.push('/');
+                router.refresh();
+                return;
+            }
+        }
+
         toast({
             variant: 'destructive',
             title: 'Error de autenticación',
-            description: 'El correo o la contraseña son incorrectos.',
+            description: 'Credenciales inválidas.',
         });
     }
   }

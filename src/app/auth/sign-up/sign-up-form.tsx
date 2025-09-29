@@ -29,9 +29,6 @@ const formSchema = z
     path: ['confirmPassword'],
   });
 
-// This should be replaced with a real database
-const users: any[] = [];
-
 export function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -48,31 +45,24 @@ export function SignUpForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Check if user already exists
-    if (users.find(u => u.email === values.email)) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+        // Mock user creation
+        const user = { fullName: values.fullName, email: values.email, password: values.password };
+        localStorage.setItem('user', JSON.stringify(user));
+      
+        toast({
+          title: '¡Cuenta creada!',
+          description: 'Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión.',
+      });
+      router.push('/auth/sign-in');
+    } catch (error) {
         toast({
             variant: 'destructive',
             title: 'Error de registro',
-            description: 'Este correo electrónico ya está en uso.',
+            description: 'Ocurrió un error al crear tu cuenta.',
         });
-        return;
     }
-
-    // "Save" the new user
-    users.push({
-        fullName: values.fullName,
-        email: values.email,
-        password: values.password, // In a real app, hash and salt this!
-    });
-    
-    console.log('Usuarios registrados:', users);
-    
-    toast({
-        title: '¡Cuenta creada!',
-        description: 'Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión.',
-    });
-    router.push('/auth/sign-in');
   }
 
   return (
