@@ -34,7 +34,7 @@ export function ExpensesChart() {
   if (expenseData.length === 0) {
     return (
       <div className="flex h-[300px] w-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">No expense data to display.</p>
+        <p className="text-sm text-muted-foreground">No hay datos de gastos para mostrar.</p>
       </div>
     );
   }

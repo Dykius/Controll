@@ -18,7 +18,7 @@ export const columns: ColumnDef<Transaction>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Date
+          Fecha
           <ArrowDownUp className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -27,11 +27,11 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "description",
-    header: "Description",
+    header: "Descripción",
   },
   {
     accessorKey: "categoryId",
-    header: "Category",
+    header: "Categoría",
     cell: ({ row }) => {
         const category = categories.find(c => c.id === row.getValue("categoryId"));
         return category ? <Badge variant="outline">{category?.name}</Badge> : null
@@ -39,7 +39,7 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    header: () => <div className="text-right">Monto</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"))
       const type = row.original.type
@@ -56,17 +56,17 @@ export const columns: ColumnDef<Transaction>[] = [
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Abrir menú</span>
                 <MoreHorizontal className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                 <DropdownMenuItem>
-                <Pencil className="mr-2 h-4 w-4" /> Edit
+                <Pencil className="mr-2 h-4 w-4" /> Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-destructive focus:text-destructive">
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                <Trash2 className="mr-2 h-4 w-4" /> Eliminar
                 </DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>

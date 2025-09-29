@@ -12,18 +12,18 @@ import { formatCurrency, formatNumberAsK } from "@/lib/utils";
 
 const chartConfig = {
     income: {
-        label: "Income",
+        label: "Ingresos",
         color: "hsl(var(--chart-2))",
     },
     expense: {
-        label: "Expense",
+        label: "Gastos",
         color: "hsl(var(--chart-5))",
     },
 };
 
 export function TrendChart() {
     const data = useMemo(() => {
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
         const monthlyData = monthNames.map(month => ({ name: month, income: 0, expense: 0 }));
         
         const currentYear = new Date().getFullYear();
@@ -49,7 +49,7 @@ export function TrendChart() {
   if (data.every(d => d.income === 0 && d.expense === 0)) {
     return (
       <div className="flex h-[300px] w-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">No trend data to display.</p>
+        <p className="text-sm text-muted-foreground">No hay datos de tendencia para mostrar.</p>
       </div>
     );
   }

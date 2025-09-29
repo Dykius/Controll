@@ -15,14 +15,14 @@ export default function BudgetsPage() {
         <div className="flex items-center justify-end">
             <Button>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                New Budget
+                Nuevo Presupuesto
             </Button>
         </div>
         
         {monthlyBudgets.length === 0 ? (
              <Card className="card-glassmorphic text-center p-12">
-                <CardTitle className="font-headline">No Budgets Set For This Month</CardTitle>
-                <CardDescription className="mt-2">Get started by creating a new budget.</CardDescription>
+                <CardTitle className="font-headline">No Hay Presupuestos Para Este Mes</CardTitle>
+                <CardDescription className="mt-2">Empieza creando un nuevo presupuesto.</CardDescription>
              </Card>
         ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -40,13 +40,13 @@ export default function BudgetsPage() {
                     <CardHeader>
                         <CardTitle className="font-headline">{category?.name}</CardTitle>
                         <CardDescription>
-                            {formatCurrency(spent)} spent of {formatCurrency(budget.amount)}
+                            {formatCurrency(spent)} gastados de {formatCurrency(budget.amount)}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <Progress value={progress} />
                         <p className={`text-sm font-medium ${remaining < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
-                            {formatCurrency(Math.abs(remaining))} {remaining < 0 ? 'over budget' : 'remaining'}
+                            {formatCurrency(Math.abs(remaining))} {remaining < 0 ? 'excedido' : 'restante'}
                         </p>
                     </CardContent>
                 </Card>

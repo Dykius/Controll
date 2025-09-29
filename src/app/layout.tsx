@@ -5,11 +5,12 @@ import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader, 
 import { MainNav } from '@/components/layout/main-nav';
 import { AppHeader } from '@/components/layout/app-header';
 import { Button } from '@/components/ui/button';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut, Settings, User } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export const metadata: Metadata = {
-  title: 'MoraMetrics',
-  description: 'Personal finance management made simple.',
+  title: 'nanobnanna',
+  description: 'Gestión de finanzas personales simplificada.',
 };
 
 export default function RootLayout({
@@ -18,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="es" className="dark" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -28,17 +29,20 @@ export default function RootLayout({
         <SidebarProvider>
           <Sidebar>
             <SidebarHeader>
-              <div className="p-4">
-                <h1 className="text-2xl font-bold text-white flex items-center gap-2 font-headline">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary">
-                      <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M2 7L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M22 7L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12 22V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M17 4.5L7 9.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <span className="group-data-[collapsible=icon]:hidden">MoraMetrics</span>
+              <div className="p-4 flex flex-col items-center gap-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M7.5 13.5c-2.2 0-4-2-4-4.5s1.8-4.5 4-4.5h9c2.2 0 4 2 4 4.5s-1.8 4.5-4 4.5h-3"/><path d="M9 13.5c-2.2 0-4 2-4 4.5s1.8 4.5 4 4.5h9c2.2 0 4-2.2 4-4.5s-1.8-4.5-4-4.5Z"/></svg>
+                <h1 className="text-2xl font-bold text-white flex items-center gap-2 font-headline group-data-[collapsible=icon]:hidden">
+                  <span>nanobnanna</span>
                 </h1>
+              </div>
+               <div className="flex items-center gap-2 px-2 py-4">
+                  <Avatar>
+                      <AvatarImage src="https://picsum.photos/seed/user/40/40" alt="Avatar de usuario" />
+                      <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                  <div className="group-data-[collapsible=icon]:hidden">
+                      <p className="font-semibold">Eeicia</p>
+                  </div>
               </div>
             </SidebarHeader>
             <SidebarContent>
@@ -47,11 +51,11 @@ export default function RootLayout({
             <SidebarFooter>
               <Button variant="ghost" className="w-full justify-start gap-2">
                 <Settings className="size-4" />
-                <span className="group-data-[collapsible=icon]:hidden">Settings</span>
+                <span className="group-data-[collapsible=icon]:hidden">Configuración</span>
               </Button>
               <Button variant="ghost" className="w-full justify-start gap-2">
                 <LogOut className="size-4" />
-                <span className="group-data-[collapsible=icon]:hidden">Log out</span>
+                <span className="group-data-[collapsible=icon]:hidden">Cerrar Sesión</span>
               </Button>
             </SidebarFooter>
           </Sidebar>

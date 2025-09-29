@@ -10,17 +10,17 @@ export function RecentTransactions() {
   return (
     <Card className="card-glassmorphic">
       <CardHeader>
-        <CardTitle className="font-headline">Recent Transactions</CardTitle>
-        <CardDescription>Your 5 most recent transactions.</CardDescription>
+        <CardTitle className="font-headline">Transacciones Recientes</CardTitle>
+        <CardDescription>Tus 5 transacciones más recientes.</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Description</TableHead>
-              <TableHead className="hidden sm:table-cell">Category</TableHead>
-              <TableHead className="hidden md:table-cell">Date</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead className="hidden sm:table-cell">Categoría</TableHead>
+              <TableHead className="hidden md:table-cell">Fecha</TableHead>
+              <TableHead className="text-right">Monto</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

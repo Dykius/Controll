@@ -2,7 +2,6 @@
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
 
@@ -11,9 +10,17 @@ export function AppHeader() {
   
   const getPageTitle = () => {
     const segment = pathname.split('/')[1];
-    if (segment === '') return 'Dashboard';
-    if (!segment) return 'Dashboard';
-    return segment.charAt(0).toUpperCase() + segment.slice(1);
+    if (segment === '') return 'Inicio';
+    if (!segment) return 'Inicio';
+
+    const titles: { [key: string]: string } = {
+        'accounts': 'Cuentas',
+        'transactions': 'Transacciones',
+        'budgets': 'Presupuestos',
+        'categories': 'Categorías'
+    }
+
+    return titles[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
   };
 
   return (
@@ -27,10 +34,6 @@ export function AppHeader() {
             <Bell className="h-5 w-5" />
             <span className="sr-only">Toggle notifications</span>
         </Button>
-        <Avatar>
-            <AvatarImage src="https://picsum.photos/seed/user/40/40" alt="User avatar" />
-            <AvatarFallback>U</AvatarFallback>
-        </Avatar>
       </div>
     </header>
   );

@@ -23,7 +23,7 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data }) 
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 justify-between">
                 <Input
-                    placeholder="Filter transactions by description..."
+                    placeholder="Filtrar transacciones por descripción..."
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     className="max-w-sm"
@@ -31,11 +31,11 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data }) 
                 <div className="flex gap-2">
                     <Button variant="outline">
                         <Upload className="mr-2 h-4 w-4" />
-                        Import CSV
+                        Importar CSV
                     </Button>
                     <Button>
                         <PlusCircle className="mr-2 h-4 w-4" />
-                        Add New
+                        Agregar Nueva
                     </Button>
                 </div>
             </div>
