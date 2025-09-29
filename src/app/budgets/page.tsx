@@ -1,0 +1,59 @@
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { budgets, categories, transactions } from "@/lib/data";
+import { formatCurrency } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+
+export default function BudgetsPage() {
+  const currentMonth = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`;
+
+  const monthlyBudgets = budgets.filter(b => b.month === currentMonth);
+
+  return (
+    <div className="space-y-8">
+        <div className="flex items-center justify-end">
+            <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                New Budget
+            </Button>
+        </div>
+        
+        {monthlyBudgets.length === 0 ? (
+             <Card className="card-glassmorphic text-center p-12">
+                <CardTitle className="font-headline">No Budgets Set For This Month</CardTitle>
+                <CardDescription className="mt-2">Get started by creating a new budget.</CardDescription>
+             </Card>
+        ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {monthlyBudgets.map((budget) => {
+                const category = categories.find(c => c.id === budget.categoryId);
+                const spent = transactions
+                .filter(t => t.categoryId === budget.categoryId && t.type === 'Expense' && new Date(t.date).toISOString().startsWith(currentMonth))
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+                const remaining = budget.amount - spent;
+                const progress = Math.min((spent / budget.amount) * 100, 100);
+
+                return (
+                <Card key={budget.id} className="card-glassmorphic">
+                    <CardHeader>
+                        <CardTitle className="font-headline">{category?.name}</CardTitle>
+                        <CardDescription>
+                            {formatCurrency(spent)} spent of {formatCurrency(budget.amount)}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        <Progress value={progress} />
+                        <p className={`text-sm font-medium ${remaining < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                            {formatCurrency(Math.abs(remaining))} {remaining < 0 ? 'over budget' : 'remaining'}
+                        </p>
+                    </CardContent>
+                </Card>
+                );
+            })}
+            </div>
+        )}
+    </div>
+  );
+}
