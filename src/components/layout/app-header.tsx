@@ -24,7 +24,7 @@ export function AppHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-10 flex h-20 items-center gap-4 border-b border-transparent bg-transparent px-4 sm:px-6 md:px-8">
+    <header className="sticky top-0 z-10 flex h-20 items-center gap-4 border-b border-transparent bg-background/80 backdrop-blur-sm px-4 sm:px-6 md:px-8">
       <div className="md:hidden">
         <SidebarTrigger />
       </div>

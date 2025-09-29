@@ -73,7 +73,7 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, ca
                     </ToggleGroupItem>
                 </ToggleGroup>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 rounded-lg card-glassmorphic">
+            <div className="p-4 sm:p-6 md:p-8 rounded-xl card-glassmorphic">
                 <DataTable columns={columns} data={filteredData} />
             </div>
         </div>

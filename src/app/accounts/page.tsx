@@ -20,14 +20,14 @@ export default async function AccountsPage() {
   const data = await getAccounts();
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <Card className="card-glassmorphic flex items-center justify-center min-h-[150px] border-dashed">
+        <Card className="card-glassmorphic flex items-center justify-center min-h-[150px] border-dashed rounded-xl">
             <Button variant="ghost" className="flex flex-col h-auto gap-2 text-muted-foreground hover:text-foreground">
                 <PlusCircle className="h-8 w-8" />
                 <span>Agregar Cuenta</span>
             </Button>
         </Card>
         {data.map(account => (
-            <Card key={account.id} className="card-glassmorphic flex flex-col justify-between min-h-[150px]">
+            <Card key={account.id} className="card-glassmorphic flex flex-col justify-between min-h-[150px] rounded-xl">
                 <CardContent className="p-4 space-y-2">
                     <div className="flex items-start justify-between">
                         {accountIcons[account.type]}

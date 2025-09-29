@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <div className="space-y-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="card-glassmorphic">
+        <Card className="card-glassmorphic rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Balance Total</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -31,7 +31,7 @@ export default function Home() {
             <p className="text-xs text-muted-foreground">En todas las cuentas</p>
           </CardContent>
         </Card>
-        <Card className="card-glassmorphic">
+        <Card className="card-glassmorphic rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ingresos Mensuales</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -41,7 +41,7 @@ export default function Home() {
             <p className="text-xs text-muted-foreground">Este mes</p>
           </CardContent>
         </Card>
-        <Card className="card-glassmorphic">
+        <Card className="card-glassmorphic rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Gastos Mensuales</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
@@ -54,7 +54,7 @@ export default function Home() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-1 lg:col-span-4 card-glassmorphic">
+        <Card className="col-span-1 lg:col-span-4 card-glassmorphic rounded-xl">
           <CardHeader>
             <CardTitle className="font-headline">Ingresos vs. Gastos</CardTitle>
           </CardHeader>
@@ -62,7 +62,7 @@ export default function Home() {
             <TrendChart />
           </CardContent>
         </Card>
-        <Card className="col-span-1 lg:col-span-3 card-glassmorphic">
+        <Card className="col-span-1 lg:col-span-3 card-glassmorphic rounded-xl">
           <CardHeader>
             <CardTitle className="font-headline">Gastos por Categoría</CardTitle>
           </CardHeader>

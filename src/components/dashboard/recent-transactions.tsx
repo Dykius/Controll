@@ -8,7 +8,7 @@ export function RecentTransactions() {
   const recent = [...transactions].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
   return (
-    <Card className="card-glassmorphic">
+    <Card className="card-glassmorphic rounded-xl">
       <CardHeader>
         <CardTitle className="font-headline">Transacciones Recientes</CardTitle>
         <CardDescription>Tus 5 transacciones más recientes.</CardDescription>
@@ -35,7 +35,7 @@ export function RecentTransactions() {
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
-                    {category && <Badge variant="outline">{category?.name}</Badge>}
+                    {category && <Badge variant="outline" className="rounded-full">{category?.name}</Badge>}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(txn.date)}</TableCell>
                   <TableCell className="text-right font-medium">

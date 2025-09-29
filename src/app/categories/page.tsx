@@ -9,25 +9,25 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card className="card-glassmorphic">
+        <Card className="card-glassmorphic rounded-xl">
           <CardHeader>
             <CardTitle className="font-headline">Categorías de Ingresos</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             {incomeCategories.map(category => (
-              <Badge key={category.id} variant="secondary" className="text-lg py-1 px-3">
+              <Badge key={category.id} variant="secondary" className="text-lg py-1 px-3 rounded-full">
                 {category.name}
               </Badge>
             ))}
           </CardContent>
         </Card>
-        <Card className="card-glassmorphic">
+        <Card className="card-glassmorphic rounded-xl">
           <CardHeader>
             <CardTitle className="font-headline">Categorías de Gastos</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             {expenseCategories.map(category => (
-              <Badge key={category.id} variant="secondary" className="text-lg py-1 px-3">
+              <Badge key={category.id} variant="secondary" className="text-lg py-1 px-3 rounded-full">
                 {category.name}
               </Badge>
             ))}

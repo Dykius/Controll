@@ -61,7 +61,7 @@ export default function RootLayout({
           </Sidebar>
           <SidebarInset>
             <AppHeader />
-            <div className="p-4 sm:p-6 md:p-8">
+            <div className="p-4 sm:p-6 md:p-8 h-[calc(100vh-5rem)] overflow-y-auto">
               {children}
             </div>
           </SidebarInset>

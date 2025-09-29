@@ -20,7 +20,7 @@ export default function BudgetsPage() {
         </div>
         
         {monthlyBudgets.length === 0 ? (
-             <Card className="card-glassmorphic text-center p-12">
+             <Card className="card-glassmorphic text-center p-12 rounded-xl">
                 <CardTitle className="font-headline">No Hay Presupuestos Para Este Mes</CardTitle>
                 <CardDescription className="mt-2">Empieza creando un nuevo presupuesto.</CardDescription>
              </Card>
@@ -36,7 +36,7 @@ export default function BudgetsPage() {
                 const progress = Math.min((spent / budget.amount) * 100, 100);
 
                 return (
-                <Card key={budget.id} className="card-glassmorphic">
+                <Card key={budget.id} className="card-glassmorphic rounded-xl">
                     <CardHeader>
                         <CardTitle className="font-headline">{category?.name}</CardTitle>
                         <CardDescription>
