@@ -21,13 +21,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  auth,
 }: Readonly<{
   children: React.ReactNode;
-  auth: React.ReactNode;
 }>) {
   // This is a placeholder for session logic
-  const session = false; // Set to false to default to auth pages
+  // We will manage session client-side to redirect correctly
+  const session = true;
 
   if (!session) {
     return (

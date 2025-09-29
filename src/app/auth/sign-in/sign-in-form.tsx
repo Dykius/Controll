@@ -53,9 +53,11 @@ export function SignInForm() {
             title: 'Inicio de sesión exitoso',
             description: `¡Bienvenido de nuevo, ${userInDb.fullName}!`,
         });
+        // Simulate setting a session and redirect
         // In a real app, you'd set a session cookie here
-        // For simulation, we just navigate
+        localStorage.setItem('session', JSON.stringify({ loggedIn: true, user: userInDb }));
         router.push('/');
+        router.refresh(); // Force a refresh to re-evaluate the layout
     } else {
         toast({
             variant: 'destructive',
