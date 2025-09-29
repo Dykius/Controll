@@ -34,7 +34,7 @@ export function MainNav() {
         
         return (
           <SidebarMenuItem key={link.href}>
-            <Link href={link.href} legacyBehavior passHref>
+            <Link href={link.href}>
               <SidebarMenuButton isActive={isActive} tooltip={link.label}>
                 <Icon className="size-5" />
                 <span className="truncate group-data-[collapsible=icon]:hidden">{link.label}</span>
