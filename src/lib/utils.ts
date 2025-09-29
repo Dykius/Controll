@@ -14,6 +14,14 @@ export function formatCurrency(amount: number, currency = 'COP') {
   }).format(amount);
 }
 
+export function formatNumberAsK(amount: number) {
+    if (amount >= 1000) {
+        return `${(amount / 1000).toFixed(0)}K`;
+    }
+    return amount.toString();
+}
+
+
 export function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('es-CO', {
     year: 'numeric',

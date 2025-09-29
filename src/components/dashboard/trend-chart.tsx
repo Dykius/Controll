@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/chart"
 import { transactions } from "@/lib/data"
 import { useMemo } from "react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatNumberAsK } from "@/lib/utils";
 
 const chartConfig = {
     income: {
@@ -61,7 +61,7 @@ export function TrendChart() {
           <BarChart data={data}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
-            <YAxis tickFormatter={(value) => formatCurrency(Number(value) / 1000, ' ' ).replace('$', '') + 'K'} tickLine={false} tickMargin={10} axisLine={false} />
+            <YAxis tickFormatter={(value) => formatNumberAsK(Number(value))} tickLine={false} tickMargin={10} axisLine={false} />
             <Tooltip cursor={false} content={<ChartTooltipContent formatter={(value) => formatCurrency(value as number)} />} />
             <ChartLegend content={<ChartLegendContent />} />
             <Bar dataKey="income" fill={chartConfig.income.color} radius={[4, 4, 0, 0]} />
