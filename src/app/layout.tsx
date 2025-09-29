@@ -9,7 +9,7 @@ import { LogOut, Settings, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export const metadata: Metadata = {
-  title: 'nanobnanna',
+  title: 'Control+',
   description: 'Gestión de finanzas personales simplificada.',
 };
 
@@ -32,7 +32,7 @@ export default function RootLayout({
               <div className="p-4 flex flex-col items-center gap-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M7.5 13.5c-2.2 0-4-2-4-4.5s1.8-4.5 4-4.5h9c2.2 0 4 2 4 4.5s-1.8 4.5-4 4.5h-3"/><path d="M9 13.5c-2.2 0-4 2-4 4.5s1.8 4.5 4 4.5h9c2.2 0 4-2.2 4-4.5s-1.8-4.5-4-4.5Z"/></svg>
                 <h1 className="text-2xl font-bold text-white flex items-center gap-2 font-headline group-data-[collapsible=icon]:hidden">
-                  <span>nanobnanna</span>
+                  <span>Control+</span>
                 </h1>
               </div>
                <div className="flex items-center gap-2 px-2 py-4">

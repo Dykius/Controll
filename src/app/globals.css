@@ -4,84 +4,85 @@
 
 @layer base {
   :root {
-    --background: 252 14% 12%; /* #1a1822 */
+    --background: 228 15% 5%; /* #0B0C10 */
     --foreground: 0 0% 98%;
 
-    --card: 252 14% 20%;
+    --card: 228 15% 7%; /* #121217 - adjusted for glass effect */
     --card-foreground: 0 0% 98%;
 
-    --popover: 252 14% 12%;
+    --popover: 228 15% 5%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 260 60% 70%; /* Adjusted purple */
+    --primary: 259 100% 65%; /* #7C4DFF */
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 252 14% 25%;
+    --secondary: 228 15% 10%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 252 14% 25%;
+    --muted: 228 15% 10%;
     --muted-foreground: 0 0% 63.9%;
 
-    --accent: 260 60% 70%; /* #b39ddb */
-    --accent-foreground: 252 14% 12%;
+    --accent: 259 100% 65%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 351 91% 47%; /* Brighter red for dark theme */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 252 14% 30%;
-    --input: 252 14% 25%;
-    --ring: 260 60% 70%; /* #b39ddb */
-
-    --radius: 0.8rem;
+    --border: 259 34% 30%; /* purple-ish border */
+    --input: 228 15% 10%;
+    --ring: 259 100% 75%; /* #C4A6FF */
+    
+    --chart-1: 151 70% 50%; /* #1CE78A - Green for income */
+    --chart-2: 280 100% 77%; /* #D07AFF - Pink/purple for expense */
 
     /* Sidebar variables for dark theme */
-    --sidebar-background: 252 14% 15%;
+    --sidebar-background: 228 15% 7%;
     --sidebar-foreground: 0 0% 95.9%;
-    --sidebar-primary: 260 60% 70%;
-    --sidebar-primary-foreground: 252 14% 12%;
-    --sidebar-accent: 252 14% 22%;
+    --sidebar-primary: 259 100% 65%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 228 15% 12%;
     --sidebar-accent-foreground: 0 0% 95.9%;
-    --sidebar-border: 252 14% 30%;
-    --sidebar-ring: 260 60% 70%;
+    --sidebar-border: 228 15% 15%;
+    --sidebar-ring: 259 100% 75%;
   }
   .dark {
-    --background: 252 14% 12%; /* #1a1822 */
+    --background: 228 15% 5%; /* #0B0C10 */
     --foreground: 0 0% 98%;
 
-    --card: 252 14% 20%;
+    --card: 228 15% 7%; /* #121217 - adjusted for glass effect */
     --card-foreground: 0 0% 98%;
 
-    --popover: 252 14% 12%;
+    --popover: 228 15% 5%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 260 60% 70%; /* Adjusted purple */
+    --primary: 259 100% 65%; /* #7C4DFF */
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 252 14% 25%;
+    --secondary: 228 15% 10%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 252 14% 25%;
+    --muted: 228 15% 10%;
     --muted-foreground: 0 0% 63.9%;
 
-    --accent: 260 60% 70%; /* #b39ddb */
-    --accent-foreground: 252 14% 12%;
+    --accent: 259 100% 65%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 351 91% 47%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 252 14% 30%;
-    --input: 252 14% 25%;
-    --ring: 260 60% 70%; /* #b39ddb */
+    --border: 259 34% 30%;
+    --input: 228 15% 10%;
+    --ring: 259 100% 75%;
 
     /* Sidebar variables for dark theme */
-    --sidebar-background: 252 14% 15%;
+    --sidebar-background: 228 15% 7%;
     --sidebar-foreground: 0 0% 95.9%;
-    --sidebar-primary: 260 60% 70%;
-    --sidebar-primary-foreground: 252 14% 12%;
-    --sidebar-accent: 252 14% 22%;
+    --sidebar-primary: 259 100% 65%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 228 15% 12%;
     --sidebar-accent-foreground: 0 0% 95.9%;
-    --sidebar-border: 252 14% 30%;
-    --sidebar-ring: 260 60% 70%;
+    --sidebar-border: 228 15% 15%;
+    --sidebar-ring: 259 100% 75%;
   }
 }
 
@@ -94,6 +95,6 @@
   }
   /* For card transparency */
   .card-glassmorphic {
-     @apply bg-card/60 backdrop-blur-xl border;
+     @apply bg-white/5 backdrop-blur-xl border shadow-[0_8px_32px_0_rgba(124,77,255,0.12)];
   }
 }
