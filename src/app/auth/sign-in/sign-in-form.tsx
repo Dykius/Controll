@@ -22,6 +22,15 @@ const formSchema = z.object({
   password: z.string().min(1, { message: 'La contraseña es requerida.' }),
 });
 
+// Mock user data - in a real app, this would come from a database
+const users = [
+    {
+        email: 'user@example.com',
+        password: 'password123',
+        fullName: 'Usuario de Prueba'
+    }
+];
+
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
@@ -36,13 +45,21 @@ export function SignInForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Aquí iría la lógica de autenticación
-    toast({
-      title: 'Inicio de sesión exitoso',
-      description: '¡Bienvenido de nuevo!',
-    });
-    router.push('/');
+    const user = users.find(u => u.email === values.email && u.password === values.password);
+
+    if (user) {
+        toast({
+            title: 'Inicio de sesión exitoso',
+            description: `¡Bienvenido de nuevo, ${user.fullName}!`,
+        });
+        router.push('/');
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Error de autenticación',
+            description: 'El correo o la contraseña son incorrectos.',
+        });
+    }
   }
 
   return (
