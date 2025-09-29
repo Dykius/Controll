@@ -4,16 +4,16 @@
 
 @layer base {
   :root {
-    --background: 228 15% 5%; /* #0B0C10 */
+    --background: 198 60% 3%; /* #0B0C10 */
     --foreground: 0 0% 98%;
 
-    --card: 228 15% 7%; /* #121217 - adjusted for glass effect */
+    --card: 240 10% 8%; /* #121217 */
     --card-foreground: 0 0% 98%;
 
     --popover: 228 15% 5%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 259 100% 65%; /* #7C4DFF */
+    --primary: 258 100% 69%; /* #8A61FF */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 228 15% 10%;
@@ -22,67 +22,41 @@
     --muted: 228 15% 10%;
     --muted-foreground: 0 0% 63.9%;
 
-    --accent: 259 100% 65%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 351 91% 47%; /* Brighter red for dark theme */
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 259 34% 30%; /* purple-ish border */
-    --input: 228 15% 10%;
-    --ring: 259 100% 75%; /* #C4A6FF */
-    
-    --chart-1: 151 70% 50%; /* #1CE78A - Green for income */
-    --chart-2: 280 100% 77%; /* #D07AFF - Pink/purple for expense */
-
-    /* Sidebar variables for dark theme */
-    --sidebar-background: 228 15% 7%;
-    --sidebar-foreground: 0 0% 95.9%;
-    --sidebar-primary: 259 100% 65%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 228 15% 12%;
-    --sidebar-accent-foreground: 0 0% 95.9%;
-    --sidebar-border: 228 15% 15%;
-    --sidebar-ring: 259 100% 75%;
-  }
-  .dark {
-    --background: 228 15% 5%; /* #0B0C10 */
-    --foreground: 0 0% 98%;
-
-    --card: 228 15% 7%; /* #121217 - adjusted for glass effect */
-    --card-foreground: 0 0% 98%;
-
-    --popover: 228 15% 5%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 259 100% 65%; /* #7C4DFF */
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 228 15% 10%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 228 15% 10%;
-    --muted-foreground: 0 0% 63.9%;
-
-    --accent: 259 100% 65%;
+    --accent: 258 100% 69%; /* #8A61FF */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 351 91% 47%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 259 34% 30%;
-    --input: 228 15% 10%;
-    --ring: 259 100% 75%;
-
-    /* Sidebar variables for dark theme */
-    --sidebar-background: 228 15% 7%;
-    --sidebar-foreground: 0 0% 95.9%;
-    --sidebar-primary: 259 100% 65%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 228 15% 12%;
-    --sidebar-accent-foreground: 0 0% 95.9%;
-    --sidebar-border: 228 15% 15%;
-    --sidebar-ring: 259 100% 75%;
+    --border: 258 100% 69% / 0.14; /* rgba(138, 97, 255, 0.14) */
+    --input: 240 10% 8% / 0.5;
+    --ring: 258 100% 79%; /* Lighter purple for focus */
+    
+    --chart-1: 151 70% 50%; /* #1CE78A - Green for income */
+    --chart-2: 326 100% 74%; /* #FF79D1 - Pink for expense */
+  }
+  .dark {
+    --background: 198 60% 3%; /* #0B0C10 */
+    --foreground: 0 0% 98%;
+    --card: 240 10% 8%; /* #121217 */
+    --card-foreground: 0 0% 98%;
+    --popover: 228 15% 5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 258 100% 69%; /* #8A61FF */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 228 15% 10%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 228 15% 10%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 258 100% 69%; /* #8A61FF */
+    --accent-foreground: 0 0% 98%;
+    --destructive: 351 91% 47%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 258 100% 69% / 0.14;
+    --input: 240 10% 8% / 0.5;
+    --ring: 258 100% 79%;
+    --chart-1: 151 70% 50%;
+    --chart-2: 326 100% 74%;
   }
 }
 
@@ -93,8 +67,13 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* For card transparency */
-  .card-glassmorphic {
-     @apply bg-white/5 backdrop-blur-xl border shadow-[0_8px_32px_0_rgba(124,77,255,0.12)];
+  .auth-input {
+    @apply w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 py-3 text-base placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-nano-purple-dark;
   }
+}
+
+@layer components {
+    .card-glassmorphic {
+        @apply bg-white/5 backdrop-blur-xl border shadow-[0_8px_32px_0_rgba(124,77,255,0.12)] rounded-xl;
+    }
 }
