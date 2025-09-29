@@ -27,7 +27,7 @@ export default function RootLayout({
   auth: React.ReactNode;
 }>) {
   // This is a placeholder for session logic
-  const session = true; // For now, we'll assume the user is logged in to show the layout
+  const session = false; // Set to false to default to auth pages
 
   if (!session) {
     return (
@@ -38,7 +38,7 @@ export default function RootLayout({
             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
         </head>
         <body className="font-body antialiased bg-background text-foreground">
-            {auth}
+            {children}
             <Toaster />
         </body>
         </html>

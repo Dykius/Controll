@@ -45,13 +45,16 @@ export function SignInForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const user = users.find(u => u.email === values.email && u.password === values.password);
-
-    if (user) {
+    // In-memory user check
+    const userInDb = users.find(u => u.email === values.email);
+    
+    if (userInDb && userInDb.password === values.password) {
         toast({
             title: 'Inicio de sesión exitoso',
-            description: `¡Bienvenido de nuevo, ${user.fullName}!`,
+            description: `¡Bienvenido de nuevo, ${userInDb.fullName}!`,
         });
+        // In a real app, you'd set a session cookie here
+        // For simulation, we just navigate
         router.push('/');
     } else {
         toast({
