@@ -10,6 +10,7 @@ type UserData = {
 
 function getActiveUserEmail(): string | null {
     if (typeof window === 'undefined') return null;
+    // The session is now stored in localStorage for client-side access
     const sessionStr = localStorage.getItem('session');
     if (!sessionStr) return null;
     try {
@@ -48,22 +49,27 @@ function saveUserData(data: UserData) {
 
 
 function getUserData(): UserData {
+    const defaultData = { accounts: [], transactions: [], categories: defaultCategories, budgets: [] };
+    if (typeof window === 'undefined') {
+        return defaultData;
+    }
+
     const email = getActiveUserEmail();
-    if (!email) return { accounts: [], transactions: [], categories: [], budgets: [] };
+    if (!email) {
+        return defaultData;
+    }
 
     const allUsers = getAllUsersData();
     const user = allUsers[email];
     
     if (user && user.data) {
-        // Ensure categories exist, if not, provide defaults
         if (!user.data.categories || user.data.categories.length === 0) {
             user.data.categories = defaultCategories;
         }
         return user.data;
     }
-
-    // For a new user or user without data, return a default structure
-    return { accounts: [], transactions: [], categories: defaultCategories, budgets: [] };
+    
+    return defaultData;
 }
 
 // NOTE: In a real app, these would be API calls.
@@ -134,6 +140,11 @@ export function getBudgets(): Budget[] {
 }
 
 export function getDashboardData() {
+    // This function can only run on the client because it uses localStorage
+    if (typeof window === 'undefined') {
+        return { totalIncome: 0, totalExpense: 0, balance: 0, transactions: [], categories: [], accounts: [] };
+    }
+
     const accounts = getAccounts();
     const { transactions, categories } = getUserData();
     

@@ -8,10 +8,14 @@ export function LogoutButton() {
     const router = useRouter();
 
     const handleLogout = () => {
-        // Clear the session cookie
+        // Clear client-side session
+        localStorage.removeItem('session');
+        // Clear the session cookie for the middleware
         document.cookie = 'session=; path=/; max-age=0;';
-        // Force a reload to ensure middleware catches the change
-        window.location.href = '/auth/sign-in';
+        
+        // Redirect to sign-in page and refresh the application state
+        router.push('/auth/sign-in');
+        router.refresh();
     };
 
     return (
