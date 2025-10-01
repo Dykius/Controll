@@ -1,10 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { accounts, categories, transactions } from "@/lib/data";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import type { Transaction, Category, Account } from "@/lib/types";
 
-export function RecentTransactions() {
+interface RecentTransactionsProps {
+  transactions: Transaction[];
+  categories: Category[];
+  accounts: Account[];
+}
+
+export function RecentTransactions({ transactions, categories, accounts }: RecentTransactionsProps) {
   const recent = [...transactions].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
   return (

@@ -1,19 +1,40 @@
+// This component needs to be a client component to access localStorage
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { ExpensesChart } from "@/components/dashboard/expenses-chart";
 import { formatCurrency } from "@/lib/utils";
-import { transactions } from "@/lib/data";
+import { getDashboardData } from "@/lib/data-service";
+import { useState, useEffect } from "react";
 
-function getDashboardData() {
-    const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
-    const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
-    const balance = totalIncome - totalExpense;
-    return { totalIncome, totalExpense, balance };
-}
+// Define a type for your dashboard data
+type DashboardData = {
+    totalIncome: number;
+    totalExpense: number;
+    balance: number;
+    transactions: any[]; // Replace 'any' with your Transaction type
+    categories: any[]; // Replace 'any' with your Category type
+    accounts: any[]; // Replace 'any' with your Account type
+};
+
 
 export default function DashboardPage() {
-    const { totalIncome, totalExpense, balance } = getDashboardData();
+    const [data, setData] = useState<DashboardData | null>(null);
+
+    useEffect(() => {
+        // Data fetching now happens on the client, inside useEffect
+        const dashboardData = getDashboardData();
+        setData(dashboardData);
+    }, []);
+
+    // Render a loading state while data is being fetched
+    if (!data) {
+        return <div>Cargando...</div>;
+    }
+
+    const { totalIncome, totalExpense, balance, transactions, categories, accounts } = data;
     
     return (
         <div className="space-y-6">
@@ -51,7 +72,7 @@ export default function DashboardPage() {
                         <CardDescription>Ingresos vs. Gastos del año actual.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <TrendChart />
+                        <TrendChart transactions={transactions} />
                     </CardContent>
                 </Card>
                 <Card className="card-glassmorphic rounded-xl">
@@ -60,12 +81,12 @@ export default function DashboardPage() {
                         <CardDescription>Cómo se distribuyen tus gastos por categoría.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ExpensesChart />
+                        <ExpensesChart transactions={transactions} categories={categories} />
                     </CardContent>
                 </Card>
             </div>
 
-            <RecentTransactions />
+            <RecentTransactions transactions={transactions} categories={categories} accounts={accounts} />
         </div>
     );
 }

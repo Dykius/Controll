@@ -15,31 +15,14 @@ import React from 'react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [session, setSession] = React.useState<boolean | null>(null);
-
-  React.useEffect(() => {
-    // In a real app, you'd have a better way to check for session.
-    // For this mock, we'll check a cookie.
-    const sessionCookie = document.cookie.includes('session=true');
-    setSession(sessionCookie);
-  }, [pathname]);
-
   const isAuthPage = pathname.startsWith('/auth');
 
+  // If it's an auth page, don't render the main app layout
   if (isAuthPage) {
     return <>{children}</>;
   }
   
-  if (session === null) {
-      // you can return a loader here
-      return null;
-  }
-  
-  if (!session) {
-    // This case should be handled by middleware, but as a fallback
-    return null;
-  }
-
+  // Render the main app layout for all other pages
   return (
     <SidebarProvider>
       <Sidebar>

@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { categories as defaultCategories } from '@/lib/data';
 
 const formSchema = z
   .object({
@@ -47,9 +48,29 @@ export function SignUpForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-        // Mock user creation
-        const user = { fullName: values.fullName, email: values.email, password: values.password };
-        localStorage.setItem('user', JSON.stringify(user));
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        
+        if (users[values.email]) {
+            toast({
+                variant: 'destructive',
+                title: 'Error de registro',
+                description: 'Este correo electrónico ya está en uso.',
+            });
+            return;
+        }
+
+        users[values.email] = {
+            fullName: values.fullName,
+            password: values.password,
+            data: {
+                accounts: [],
+                transactions: [],
+                categories: defaultCategories, // Start with default categories
+                budgets: [],
+            }
+        };
+
+        localStorage.setItem('users', JSON.stringify(users));
       
         toast({
           title: '¡Cuenta creada!',

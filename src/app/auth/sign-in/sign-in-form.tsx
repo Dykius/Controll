@@ -36,32 +36,30 @@ export function SignInForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // This is a mock login. In a real app, you'd call an API.
-    if (values.email === 'user@example.com' && values.password === 'password123') {
-        // Simulate setting a session for mock purposes
-        document.cookie = "session=true; path=/";
+    // This logic runs on the client-side
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    const user = users[values.email];
+
+    if (user && user.password === values.password) {
+        const sessionPayload = { email: values.email, name: user.fullName };
+        
+        // Use localStorage for client-side session state
+        localStorage.setItem('session', JSON.stringify(sessionPayload));
+
+        // For the middleware, we still need a cookie.
+        // The middleware only cares if the cookie exists, not the content for this simulation.
+        document.cookie = `session=true; path=/; max-age=86400`; // Expires in 24 hours
+
         toast({
             title: 'Inicio de sesión exitoso',
-            description: `¡Bienvenido de nuevo!`,
+            description: `¡Bienvenido de nuevo, ${user.fullName}!`,
         });
+        
+        // Use Next.js router for navigation. This is more reliable.
         router.push('/');
-        router.refresh();
-    } else {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const user = JSON.parse(storedUser);
-            if(user.email === values.email && user.password === values.password) {
-                document.cookie = "session=true; path=/";
-                toast({
-                    title: 'Inicio de sesión exitoso',
-                    description: `¡Bienvenido de nuevo!`,
-                });
-                router.push('/');
-                router.refresh();
-                return;
-            }
-        }
+        router.refresh(); // This ensures the page re-renders with the new state.
 
+    } else {
         toast({
             variant: 'destructive',
             title: 'Error de autenticación',

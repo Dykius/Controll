@@ -1,8 +1,12 @@
+
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { categories } from "@/lib/data";
+import { getCategories } from "@/lib/data-service";
 import { Badge } from "@/components/ui/badge";
 
 export default function CategoriesPage() {
+  const categories = getCategories();
   const incomeCategories = categories.filter(c => c.type === 'Income');
   const expenseCategories = categories.filter(c => c.type === 'Expense');
 
@@ -19,6 +23,7 @@ export default function CategoriesPage() {
                 {category.name}
               </Badge>
             ))}
+             {incomeCategories.length === 0 && <p className="text-sm text-muted-foreground">No hay categorías de ingresos.</p>}
           </CardContent>
         </Card>
         <Card className="card-glassmorphic rounded-xl">
@@ -31,6 +36,7 @@ export default function CategoriesPage() {
                 {category.name}
               </Badge>
             ))}
+            {expenseCategories.length === 0 && <p className="text-sm text-muted-foreground">No hay categorías de gastos.</p>}
           </CardContent>
         </Card>
       </div>

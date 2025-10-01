@@ -6,19 +6,26 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
-import { categories, transactions } from "@/lib/data"
 import { useMemo } from "react";
 import { formatCurrency } from "@/lib/utils";
+import type { Transaction, Category } from "@/lib/types";
 
-const chartConfig = categories.reduce((acc, category, index) => {
-  acc[category.name] = {
-    label: category.name,
-    color: `hsl(var(--chart-${(index % 5) + 1}))`,
-  };
-  return acc;
-}, {} as any);
+interface ExpensesChartProps {
+  transactions: Transaction[];
+  categories: Category[];
+}
 
-export function ExpensesChart() {
+export function ExpensesChart({ transactions, categories }: ExpensesChartProps) {
+  const chartConfig = useMemo(() => {
+    return categories.reduce((acc, category, index) => {
+      acc[category.name] = {
+        label: category.name,
+        color: `hsl(var(--chart-${(index % 5) + 1}))`,
+      };
+      return acc;
+    }, {} as any);
+  }, [categories]);
+
   const expenseData = useMemo(() => {
     return categories
       .filter(c => c.type === 'Expense')
@@ -29,7 +36,7 @@ export function ExpensesChart() {
         return { name: category.name, value: total, fill: chartConfig[category.name]?.color };
       })
       .filter(item => item.value > 0);
-  }, []);
+  }, [transactions, categories, chartConfig]);
 
   if (expenseData.length === 0) {
     return (
