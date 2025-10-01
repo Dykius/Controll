@@ -40,13 +40,18 @@ export function SignInForm() {
     const user = users[values.email];
 
     if (user && user.password === values.password) {
-        localStorage.setItem('session', JSON.stringify({ email: values.email, name: user.fullName }));
+        const sessionPayload = { email: values.email, name: user.fullName };
+        // Set a session cookie that the middleware can read
+        document.cookie = `session=${JSON.stringify(sessionPayload)}; path=/; max-age=86400`; // Expires in 24 hours
+
         toast({
             title: 'Inicio de sesión exitoso',
             description: `¡Bienvenido de nuevo, ${user.fullName}!`,
         });
-        router.push('/');
-        router.refresh();
+        
+        // Use window.location.href to force a full page reload, which ensures the middleware runs
+        window.location.href = '/';
+
     } else {
         toast({
             variant: 'destructive',

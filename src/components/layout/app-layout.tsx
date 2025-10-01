@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   Sidebar,
   SidebarContent,
@@ -15,39 +15,14 @@ import React from 'react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    // Only check for session on client-side and outside of auth pages
-    if (typeof window !== 'undefined') {
-      const isAuthPage = pathname.startsWith('/auth');
-      if (!isAuthPage) {
-        const sessionData = localStorage.getItem('session');
-        if (!sessionData) {
-          router.replace('/auth/sign-in');
-        }
-      }
-      setIsLoading(false);
-    }
-  }, [pathname, router]);
-
   const isAuthPage = pathname.startsWith('/auth');
 
+  // If it's an auth page, don't render the main app layout
   if (isAuthPage) {
     return <>{children}</>;
   }
   
-  if (isLoading) {
-      // You can return a loader here, e.g., a full-screen spinner
-      return (
-        <div className="flex items-center justify-center h-screen w-screen">
-          {/* You could put a spinner component here */}
-        </div>
-      );
-  }
-  
-  // After loading, if we are still on a protected page, render the layout
+  // Render the main app layout for all other pages
   return (
     <SidebarProvider>
       <Sidebar>
