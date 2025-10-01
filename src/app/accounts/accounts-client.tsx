@@ -5,6 +5,8 @@ import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Landmark, PlusCircle, Trash, Wallet } from "lucide-react";
 import type { Account } from "@/lib/types";
+import { deleteAccount } from "@/lib/data-service";
+import { useRouter } from "next/navigation";
 
 interface AccountsClientProps {
     data: Account[];
@@ -17,6 +19,15 @@ const accountIcons = {
 }
 
 export const AccountsClient: React.FC<AccountsClientProps> = ({ data }) => {
+    const router = useRouter();
+
+    const handleDelete = (accountId: string) => {
+        if (confirm("¿Estás seguro de que quieres eliminar esta cuenta? Esto también eliminará todas sus transacciones asociadas.")) {
+            deleteAccount(accountId);
+            router.refresh();
+        }
+    };
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <Card className="card-glassmorphic flex items-center justify-center min-h-[150px] border-dashed rounded-xl">
@@ -38,7 +49,7 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data }) => {
                     </CardContent>
                     <div className="p-2 flex justify-end items-center text-muted-foreground">
                         <span className="w-2 h-2 rounded-full bg-green-500 mr-auto ml-2"></span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(account.id)}>
                             <Trash className="h-4 w-4 text-destructive" />
                         </Button>
                     </div>

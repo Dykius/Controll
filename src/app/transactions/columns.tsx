@@ -5,23 +5,10 @@ import { Transaction } from "@/lib/types"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Pencil, Trash2, ArrowDownUp, PlusCircle } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { MoreHorizontal, Pencil, Trash2, ArrowDownUp } from "lucide-react"
 import { getCategories, getAccounts } from "@/lib/data-service";
 import { cn } from "@/lib/utils"
 
-
-const IconMap = {
-    'Comida': 'Utensils',
-    'Salario': 'Briefcase',
-    'Transporte': 'Car',
-    'Arriendo': 'Home',
-    'Freelance': 'Laptop',
-    'Servicios': 'Lightbulb',
-    'Salud': 'HeartPulse',
-    'Entretenimiento': 'Ticket',
-    'Default': 'ShoppingCart',
-};
 
 export const columns: ColumnDef<Transaction>[] = [
   {
@@ -32,13 +19,10 @@ export const columns: ColumnDef<Transaction>[] = [
         const accounts = getAccounts();
         const category = categories.find(c => c.id === row.original.categoryId);
         const account = accounts.find(a => a.id === row.original.accountId);
-        // This is a placeholder, you'd need a component that maps string to icon
-        // const Icon = category ? IconMap[category.name] || IconMap['Default'] : IconMap['Default'];
         return (
              <div className="flex items-center gap-3">
-                 <div className="bg-secondary p-2 rounded-full">
-                    {/* <Icon className="h-5 w-5" /> Placeholder for dynamic icons */}
-                    <span className="h-5 w-5 flex items-center justify-center font-bold">{category?.name.charAt(0)}</span>
+                 <div className="bg-secondary p-2 rounded-full h-8 w-8 flex items-center justify-center">
+                    <span className="font-bold text-xs">{category?.name.charAt(0)}</span>
                  </div>
                  <div>
                     <div className="font-medium">{row.getValue("description")}</div>
@@ -69,16 +53,16 @@ export const columns: ColumnDef<Transaction>[] = [
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"))
       const type = row.original.type
-      const formatted = formatCurrency(amount)
+      
+      const sign = type === 'Income' ? '+' : '-';
+      const formatted = formatCurrency(amount);
 
       return (
-        <div className="flex items-center justify-end gap-2">
-            <div className={cn("text-right font-bold", type === 'Income' ? 'text-[hsl(var(--chart-1))]' : 'text-[hsl(var(--chart-2))]')}>
-                {formatted}
-            </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                <PlusCircle className="h-4 w-4" />
-            </Button>
+        <div className={cn(
+            "text-right font-bold", 
+            type === 'Income' ? 'text-[hsl(var(--chart-1))]' : 'text-[hsl(var(--chart-2))]'
+        )}>
+            {sign} {formatted}
         </div>
       )
     },

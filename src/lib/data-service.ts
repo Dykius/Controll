@@ -1,4 +1,5 @@
 import type { Account, Budget, Category, Transaction } from "./types";
+import { categories as defaultCategories } from './data';
 
 type UserData = {
     accounts: Account[];
@@ -19,7 +20,7 @@ function getActiveUserEmail(): string | null {
     }
 }
 
-function getAllUsersData(): Record<string, { data: UserData }> {
+function getAllUsersData(): Record<string, { data: UserData; password?: string, fullName?: string }> {
      if (typeof window === 'undefined') return {};
     const usersStr = localStorage.getItem('users');
     if (!usersStr) return {};
@@ -30,6 +31,22 @@ function getAllUsersData(): Record<string, { data: UserData }> {
     }
 }
 
+function saveUserData(data: UserData) {
+    const email = getActiveUserEmail();
+    if (!email) return;
+
+    const allUsers = getAllUsersData();
+    const currentUserData = allUsers[email] || {};
+
+    allUsers[email] = {
+        ...currentUserData,
+        data: data
+    };
+
+    localStorage.setItem('users', JSON.stringify(allUsers));
+}
+
+
 function getUserData(): UserData {
     const email = getActiveUserEmail();
     if (!email) return { accounts: [], transactions: [], categories: [], budgets: [] };
@@ -37,24 +54,76 @@ function getUserData(): UserData {
     const allUsers = getAllUsersData();
     const user = allUsers[email];
     
-    // If user exists and has data, return it. Otherwise, return empty state.
     if (user && user.data) {
+        // Ensure categories exist, if not, provide defaults
+        if (!user.data.categories || user.data.categories.length === 0) {
+            user.data.categories = defaultCategories;
+        }
         return user.data;
     }
 
-    return { accounts: [], transactions: [], categories: [], budgets: [] };
+    // For a new user or user without data, return a default structure
+    return { accounts: [], transactions: [], categories: defaultCategories, budgets: [] };
 }
 
 // NOTE: In a real app, these would be API calls.
 // For now, they read from and write to localStorage.
 
 export function getAccounts(): Account[] {
-    return getUserData().accounts;
+    const data = getUserData();
+    // Calculate current balance for each account
+    return data.accounts.map(account => {
+        const balance = data.transactions
+            .filter(t => t.accountId === account.id)
+            .reduce((acc, t) => {
+                if (t.type === 'Income') return acc + t.amount;
+                return acc - t.amount;
+            }, account.initialBalance);
+        return { ...account, initialBalance: balance };
+    });
 }
+
+export function addAccount(account: Omit<Account, 'id' | 'currency'>) {
+    const data = getUserData();
+    const newAccount: Account = {
+        ...account,
+        id: `acc-${new Date().getTime()}`,
+        currency: 'COP',
+    };
+    const updatedData = { ...data, accounts: [...data.accounts, newAccount] };
+    saveUserData(updatedData);
+}
+
+export function deleteAccount(accountId: string) {
+    const data = getUserData();
+    const updatedAccounts = data.accounts.filter(acc => acc.id !== accountId);
+    const updatedTransactions = data.transactions.filter(t => t.accountId !== accountId);
+    const updatedData = { ...data, accounts: updatedAccounts, transactions: updatedTransactions };
+    saveUserData(updatedData);
+}
+
 
 export function getTransactions(): Transaction[] {
     return getUserData().transactions;
 }
+
+export function addTransaction(transaction: Omit<Transaction, 'id'>) {
+    const data = getUserData();
+    const newTransaction: Transaction = {
+        ...transaction,
+        id: `txn-${new Date().getTime()}`,
+    };
+    const updatedData = { ...data, transactions: [...data.transactions, newTransaction] };
+    saveUserData(updatedData);
+}
+
+export function deleteTransaction(transactionId: string) {
+    const data = getUserData();
+    const updatedTransactions = data.transactions.filter(t => t.id !== transactionId);
+    const updatedData = { ...data, transactions: updatedTransactions };
+    saveUserData(updatedData);
+}
+
 
 export function getCategories(): Category[] {
     return getUserData().categories;
@@ -65,9 +134,12 @@ export function getBudgets(): Budget[] {
 }
 
 export function getDashboardData() {
-    const { transactions, categories, accounts } = getUserData();
+    const accounts = getAccounts();
+    const { transactions, categories } = getUserData();
+    
     const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
     const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
-    const balance = totalIncome - totalExpense;
+    const balance = accounts.reduce((sum, acc) => sum + acc.initialBalance, 0);
+    
     return { totalIncome, totalExpense, balance, transactions, categories, accounts };
 }
