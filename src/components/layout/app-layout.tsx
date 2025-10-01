@@ -16,21 +16,19 @@ import React from 'react';
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [session, setSession] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    try {
-      const sessionData = localStorage.getItem('session');
-      if (sessionData) {
-        setSession(sessionData);
-      } else {
-        router.replace('/auth/sign-in');
+    // Only check for session on client-side and outside of auth pages
+    if (typeof window !== 'undefined') {
+      const isAuthPage = pathname.startsWith('/auth');
+      if (!isAuthPage) {
+        const sessionData = localStorage.getItem('session');
+        if (!sessionData) {
+          router.replace('/auth/sign-in');
+        }
       }
-    } catch (error) {
-      // Could be server-side rendering
-    } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }, [pathname, router]);
 
@@ -41,15 +39,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }
   
   if (isLoading) {
-      // You can return a loader here
-      return null;
+      // You can return a loader here, e.g., a full-screen spinner
+      return (
+        <div className="flex items-center justify-center h-screen w-screen">
+          {/* You could put a spinner component here */}
+        </div>
+      );
   }
   
-  if (!session) {
-    // Already handled by useEffect redirect, but as a fallback
-    return null;
-  }
-
+  // After loading, if we are still on a protected page, render the layout
   return (
     <SidebarProvider>
       <Sidebar>
