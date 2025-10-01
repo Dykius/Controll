@@ -36,32 +36,18 @@ export function SignInForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // This is a mock login. In a real app, you'd call an API.
-    if (values.email === 'user@example.com' && values.password === 'password123') {
-        // Simulate setting a session for mock purposes
-        document.cookie = "session=true; path=/";
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    const user = users[values.email];
+
+    if (user && user.password === values.password) {
+        localStorage.setItem('session', JSON.stringify({ email: values.email, name: user.fullName }));
         toast({
             title: 'Inicio de sesión exitoso',
-            description: `¡Bienvenido de nuevo!`,
+            description: `¡Bienvenido de nuevo, ${user.fullName}!`,
         });
         router.push('/');
         router.refresh();
     } else {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const user = JSON.parse(storedUser);
-            if(user.email === values.email && user.password === values.password) {
-                document.cookie = "session=true; path=/";
-                toast({
-                    title: 'Inicio de sesión exitoso',
-                    description: `¡Bienvenido de nuevo!`,
-                });
-                router.push('/');
-                router.refresh();
-                return;
-            }
-        }
-
         toast({
             variant: 'destructive',
             title: 'Error de autenticación',

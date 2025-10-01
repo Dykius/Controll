@@ -1,13 +1,10 @@
-import { accounts } from "@/lib/data";
+
+"use client";
+import { getAccounts } from "@/lib/data-service";
 import { AccountsClient } from "./accounts-client";
 
-// Simulate fetching data from a server
-async function getAccounts() {
-  return accounts;
-}
-
-export default async function AccountsPage() {
-  const data = await getAccounts();
+export default function AccountsPage() {
+  const data = getAccounts();
   return (
     <AccountsClient data={data}/>
   );

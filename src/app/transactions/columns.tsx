@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash2, ArrowDownUp, PlusCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { categories, accounts } from "@/lib/data"
+import { getCategories, getAccounts } from "@/lib/data-service";
 import { cn } from "@/lib/utils"
+
 
 const IconMap = {
     'Comida': 'Utensils',
@@ -27,6 +28,8 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "description",
     header: "Descripción",
     cell: ({ row }) => {
+        const categories = getCategories();
+        const accounts = getAccounts();
         const category = categories.find(c => c.id === row.original.categoryId);
         const account = accounts.find(a => a.id === row.original.accountId);
         // This is a placeholder, you'd need a component that maps string to icon

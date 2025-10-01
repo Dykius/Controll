@@ -1,11 +1,18 @@
+
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { budgets, categories, transactions } from "@/lib/data";
+import { getBudgets, getCategories, getTransactions } from "@/lib/data-service";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 
 export default function BudgetsPage() {
+  const budgets = getBudgets();
+  const categories = getCategories();
+  const transactions = getTransactions();
+
   const currentMonth = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`;
 
   const monthlyBudgets = budgets.filter(b => b.month === currentMonth);

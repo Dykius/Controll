@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Sidebar,
   SidebarContent,
@@ -15,14 +15,24 @@ import React from 'react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [session, setSession] = React.useState<boolean | null>(null);
+  const router = useRouter();
+  const [session, setSession] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // In a real app, you'd have a better way to check for session.
-    // For this mock, we'll check a cookie.
-    const sessionCookie = document.cookie.includes('session=true');
-    setSession(sessionCookie);
-  }, [pathname]);
+    try {
+      const sessionData = localStorage.getItem('session');
+      if (sessionData) {
+        setSession(sessionData);
+      } else {
+        router.replace('/auth/sign-in');
+      }
+    } catch (error) {
+      // Could be server-side rendering
+    } finally {
+        setIsLoading(false);
+    }
+  }, [pathname, router]);
 
   const isAuthPage = pathname.startsWith('/auth');
 
@@ -30,13 +40,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
   
-  if (session === null) {
-      // you can return a loader here
+  if (isLoading) {
+      // You can return a loader here
       return null;
   }
   
   if (!session) {
-    // This case should be handled by middleware, but as a fallback
+    // Already handled by useEffect redirect, but as a fallback
     return null;
   }
 

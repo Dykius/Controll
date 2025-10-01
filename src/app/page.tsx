@@ -3,17 +3,13 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { ExpensesChart } from "@/components/dashboard/expenses-chart";
 import { formatCurrency } from "@/lib/utils";
-import { transactions, categories, accounts } from "@/lib/data";
-import type { Transaction, Category, Account } from "@/lib/types";
-
-function getDashboardData() {
-    const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
-    const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
-    const balance = totalIncome - totalExpense;
-    return { totalIncome, totalExpense, balance, transactions, categories, accounts };
-}
+import { getDashboardData } from "@/lib/data-service";
 
 export default function DashboardPage() {
+    // This is now a client component to access localStorage
+    // In a real app, this data fetching would happen on the server with user session
+    "use client";
+    
     const { totalIncome, totalExpense, balance, transactions, categories, accounts } = getDashboardData();
     
     return (
