@@ -3,17 +3,18 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { ExpensesChart } from "@/components/dashboard/expenses-chart";
 import { formatCurrency } from "@/lib/utils";
-import { transactions } from "@/lib/data";
+import { transactions, categories, accounts } from "@/lib/data";
+import type { Transaction, Category, Account } from "@/lib/types";
 
 function getDashboardData() {
     const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
     const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
     const balance = totalIncome - totalExpense;
-    return { totalIncome, totalExpense, balance };
+    return { totalIncome, totalExpense, balance, transactions, categories, accounts };
 }
 
 export default function DashboardPage() {
-    const { totalIncome, totalExpense, balance } = getDashboardData();
+    const { totalIncome, totalExpense, balance, transactions, categories, accounts } = getDashboardData();
     
     return (
         <div className="space-y-6">
@@ -51,7 +52,7 @@ export default function DashboardPage() {
                         <CardDescription>Ingresos vs. Gastos del año actual.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <TrendChart />
+                        <TrendChart transactions={transactions} />
                     </CardContent>
                 </Card>
                 <Card className="card-glassmorphic rounded-xl">
@@ -60,12 +61,12 @@ export default function DashboardPage() {
                         <CardDescription>Cómo se distribuyen tus gastos por categoría.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ExpensesChart />
+                        <ExpensesChart transactions={transactions} categories={categories} />
                     </CardContent>
                 </Card>
             </div>
 
-            <RecentTransactions />
+            <RecentTransactions transactions={transactions} categories={categories} accounts={accounts} />
         </div>
     );
 }

@@ -6,22 +6,26 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
-import { transactions } from "@/lib/data"
 import { useMemo } from "react";
 import { formatCurrency, formatNumberAsK } from "@/lib/utils";
+import type { Transaction } from "@/lib/types";
+
+interface TrendChartProps {
+  transactions: Transaction[];
+}
 
 const chartConfig = {
     income: {
         label: "Ingresos",
-        color: "hsl(var(--chart-2))",
+        color: "hsl(var(--chart-1))",
     },
     expense: {
         label: "Gastos",
-        color: "hsl(var(--chart-5))",
+        color: "hsl(var(--chart-2))",
     },
 };
 
-export function TrendChart() {
+export function TrendChart({ transactions }: TrendChartProps) {
     const data = useMemo(() => {
         const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
         const monthlyData = monthNames.map(month => ({ name: month, income: 0, expense: 0 }));
@@ -44,7 +48,7 @@ export function TrendChart() {
         const currentMonthIndex = new Date().getMonth();
         return monthlyData.slice(0, currentMonthIndex + 1);
 
-    }, []);
+    }, [transactions]);
 
   if (data.every(d => d.income === 0 && d.expense === 0)) {
     return (
