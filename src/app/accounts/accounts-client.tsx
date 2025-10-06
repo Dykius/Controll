@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Landmark, PlusCircle, Trash, Wallet } from "lucide-react";
@@ -37,6 +37,8 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
 
+    const totalPatrimony = data.reduce((sum, account) => sum + account.balance, 0);
+
     const handleDeleteRequest = (accountId: string) => {
         setAccountToDelete(accountId);
         setIsAlertOpen(true);
@@ -57,7 +59,16 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
     }
 
     return (
-        <>
+        <div className="space-y-8">
+            <Card className="card-glassmorphic rounded-xl">
+                <CardHeader>
+                    <CardTitle className="font-headline text-lg">Patrimonio Neto Total</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-4xl font-bold">{formatCurrency(totalPatrimony)}</p>
+                </CardContent>
+            </Card>
+            
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <DialogTrigger asChild>
@@ -112,6 +123,6 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </>
+        </div>
     );
 };
