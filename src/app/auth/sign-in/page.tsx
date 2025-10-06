@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { AuthCard } from '@/components/auth/auth-card';
 import { BackgroundPattern } from '@/components/auth/background-pattern';
 import { SignInForm } from './sign-in-form';
-import { PlusCircle } from 'lucide-react';
+import { GaugeCircle } from 'lucide-react';
 
 export default function SignInPage() {
   return (
@@ -12,7 +12,7 @@ export default function SignInPage() {
         <AuthCard
           logo={
             <div className="flex items-center gap-3 text-white">
-              <PlusCircle className="h-10 w-10 text-primary" />
+              <GaugeCircle className="h-10 w-10 text-primary" />
               <span className="text-4xl font-bold">Control+</span>
             </div>
           }

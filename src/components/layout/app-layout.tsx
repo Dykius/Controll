@@ -13,7 +13,7 @@ import {
 import { MainNav } from '@/components/layout/main-nav';
 import { AppHeader } from '@/components/layout/app-header';
 import React from 'react';
-import { PlusCircle } from 'lucide-react';
+import { GaugeCircle } from 'lucide-react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -30,7 +30,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar>
         <SidebarHeader>
            <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
-              <PlusCircle className="h-8 w-8 text-primary" />
+              <GaugeCircle className="h-8 w-8 text-primary" />
               <span className="text-2xl font-bold">Control+</span>
             </div>
         </SidebarHeader>
