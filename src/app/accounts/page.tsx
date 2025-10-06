@@ -9,9 +9,13 @@ export default function AccountsPage() {
   const [data, setData] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const refreshAccounts = () => {
     const accountsData = getAccounts();
     setData(accountsData);
+  }
+
+  useEffect(() => {
+    refreshAccounts();
     setIsLoading(false);
   }, []);
   
@@ -20,6 +24,6 @@ export default function AccountsPage() {
   }
 
   return (
-    <AccountsClient data={data}/>
+    <AccountsClient data={data} onAccountChange={refreshAccounts}/>
   );
 }

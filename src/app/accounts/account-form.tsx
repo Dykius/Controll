@@ -15,7 +15,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { addAccount } from '@/lib/data-service';
 
@@ -31,7 +30,6 @@ const formSchema = z.object({
 
 export function AccountForm({ onSuccess }: AccountFormProps) {
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,7 +47,6 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
           title: '¡Cuenta agregada!',
           description: 'Tu nueva cuenta ha sido registrada.',
       });
-      router.refresh();
       onSuccess();
     } catch (error) {
         toast({

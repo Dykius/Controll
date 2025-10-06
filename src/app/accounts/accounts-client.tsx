@@ -7,13 +7,13 @@ import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Landmark, PlusCircle, Trash, Wallet } from "lucide-react";
 import type { Account } from "@/lib/types";
-import { deleteAccount } from "@/lib/data-service";
-import { useRouter } from "next/navigation";
+import { deleteAccount, getAccounts } from "@/lib/data-service";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AccountForm } from "./account-form";
 
 interface AccountsClientProps {
     data: Account[];
+    onAccountChange: () => void;
 }
 
 const accountIcons = {
@@ -22,19 +22,20 @@ const accountIcons = {
     Cash: <Wallet className="h-8 w-8 text-muted-foreground" />
 }
 
-export const AccountsClient: React.FC<AccountsClientProps> = ({ data }) => {
-    const router = useRouter();
+export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountChange }) => {
     const [isFormOpen, setIsFormOpen] = useState(false);
 
     const handleDelete = (accountId: string) => {
         if (confirm("¿Estás seguro de que quieres eliminar esta cuenta? Esto también eliminará todas sus transacciones asociadas.")) {
             deleteAccount(accountId);
-            // Instead of router.refresh(), we can manually update the state to reflect the change immediately
-            // This is a bit more complex, so for now we will refresh the whole page.
-            // A better solution would involve state management (like Zustand or Context)
-            window.location.reload();
+            onAccountChange(); // Re-fetch accounts and update state
         }
     };
+    
+    const handleSuccess = () => {
+        setIsFormOpen(false);
+        onAccountChange();
+    }
 
     return (
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
@@ -71,7 +72,7 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data }) => {
                 <DialogHeader>
                     <DialogTitle className="font-headline">Nueva Cuenta</DialogTitle>
                 </DialogHeader>
-                <AccountForm onSuccess={() => setIsFormOpen(false)} />
+                <AccountForm onSuccess={handleSuccess} />
             </DialogContent>
         </Dialog>
     );
