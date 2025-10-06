@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import {
   Sidebar,
   SidebarContent,
@@ -28,25 +29,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 30 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-primary"
-            >
-              <path
-                d="M14.6869 11.2334L18.4239 16.8964L20.8913 24.5L25.922 17.5186L28.9038 12.8711L25.101 6.83984L14.6869 11.2334Z"
-                fill="currentColor"
-              />
-              <path
-                d="M31.2588 4.97852C32.1963 5.86816 32.5579 7.04004 32.5579 8.49414C32.5579 10.1543 31.9449 11.5811 30.7188 12.7744L28.9041 12.8701L25.1014 6.83887L31.2588 4.97852Z"
-                fill="currentColor"
-                className="text-indigo-400"
-              />
-            </svg>
-            <span className="text-xl font-bold">Control+</span>
+            <Image 
+              src="/Logo.png" 
+              alt="Control+ Logo" 
+              width={150} 
+              height={36}
+              quality={100}
+            />
           </div>
         </SidebarHeader>
         <SidebarContent className="p-2">
