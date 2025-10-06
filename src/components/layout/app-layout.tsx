@@ -28,15 +28,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Image 
-              src="/Logo.png" 
-              alt="Control+ Logo" 
-              width={150} 
-              height={36}
-              quality={100}
-            />
-          </div>
+          <Image 
+            src="/Logo.png" 
+            alt="Control+ Logo" 
+            width={150} 
+            height={36}
+            quality={100}
+            className="group-data-[collapsible=icon]:hidden"
+          />
         </SidebarHeader>
         <SidebarContent className="p-2">
           <MainNav />
