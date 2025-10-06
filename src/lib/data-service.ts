@@ -11,7 +11,6 @@ type UserData = {
 
 function getActiveUserEmail(): string | null {
     if (typeof window === 'undefined') return null;
-    // The session is now stored in localStorage for client-side access
     const sessionStr = localStorage.getItem('session');
     if (!sessionStr) return null;
     try {
@@ -83,6 +82,12 @@ export function getAccounts(): Account[] {
         const balance = data.transactions
             .filter(t => t.accountId === account.id)
             .reduce((acc, t) => {
+                // For credit cards, 'Income' means a payment to the card, which reduces the balance (debt).
+                if (account.type === 'Credit Card') {
+                    if (t.type === 'Income') return acc - t.amount; // Payment to card
+                    return acc + t.amount; // Expense on card
+                }
+                // For other accounts
                 if (t.type === 'Income') return acc + t.amount;
                 return acc - t.amount;
             }, account.initialBalance);
@@ -152,7 +157,9 @@ export function getDashboardData() {
     
     const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
     const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
-    const balance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+    
+    // Balance calculation should exclude credit card debt from total patrimony
+    const balance = accounts.filter(acc => acc.type !== 'Credit Card').reduce((sum, acc) => sum + acc.balance, 0);
     
     return { totalIncome, totalExpense, balance, transactions, categories, accounts };
 }

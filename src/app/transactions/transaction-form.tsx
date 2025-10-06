@@ -57,16 +57,41 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
   });
   
   const transactionType = form.watch('type');
+  const accountId = form.watch('accountId');
+  const selectedAccount = accounts.find(a => a.id === accountId);
+
+  const isCreditCard = selectedAccount?.type === 'Credit Card';
+
+  // For credit cards, an "Income" transaction is a payment to the card.
+  const filteredCategories = isCreditCard && transactionType === 'Income'
+    ? categories.filter(c => c.type === 'Income' || c.name === 'Pago de Tarjeta') // A specific category for payments
+    : categories.filter(c => c.type === transactionType);
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-        if (values.type === 'Expense') {
-            const account = accounts.find(a => a.id === values.accountId);
-            if (account && account.balance < values.amount) {
+        const account = accounts.find(a => a.id === values.accountId);
+
+        // Regular accounts: check for sufficient balance on expenses
+        if (account && account.type !== 'Credit Card' && values.type === 'Expense') {
+            if (account.balance < values.amount) {
                 toast({
                     variant: 'destructive',
                     title: 'Saldo insuficiente',
                     description: `No tienes suficiente saldo en la cuenta "${account.name}".`,
+                });
+                return;
+            }
+        }
+        
+        // Credit cards: check if expense exceeds available credit
+        if (account && account.type === 'Credit Card' && values.type === 'Expense') {
+            const availableCredit = (account.creditLimit ?? 0) - account.balance;
+            if (values.amount > availableCredit) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Límite de crédito excedido',
+                    description: `Esta compra supera tu crédito disponible en la tarjeta "${account.name}".`,
                 });
                 return;
             }
@@ -111,7 +136,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     <FormControl>
                       <RadioGroupItem value="Income" />
                     </FormControl>
-                    <FormLabel className="font-normal">Ingreso</FormLabel>
+                    <FormLabel className="font-normal">{isCreditCard ? 'Pago a Tarjeta' : 'Ingreso'}</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
@@ -166,11 +191,15 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                    {accounts.map(account => (
-                        <SelectItem key={account.id} value={account.id}>
-                        {account.name} ({formatCurrency(account.balance)})
-                        </SelectItem>
-                    ))}
+                    {accounts.map(account => {
+                       const isCC = account.type === 'Credit Card';
+                       const available = isCC && account.creditLimit ? account.creditLimit - account.balance : account.balance;
+                       return (
+                         <SelectItem key={account.id} value={account.id}>
+                          {account.name} ({isCC ? 'Disp: ' : ''}{formatCurrency(available)})
+                         </SelectItem>
+                       )
+                    })}
                     </SelectContent>
                 </Select>
                 <FormMessage />
@@ -190,7 +219,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                    {categories.filter(c => c.type === transactionType).map(category => (
+                    {filteredCategories.map(category => (
                         <SelectItem key={category.id} value={category.id}>
                         {category.name}
                         </SelectItem>
