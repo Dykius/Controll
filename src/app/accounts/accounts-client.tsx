@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -52,13 +52,38 @@ const AccountCard = ({ account, onDelete }: { account: Account, onDelete: (id: s
     </Card>
 );
 
+const AccountGroup = ({ title, accounts, onDelete }: { title: string; accounts: Account[]; onDelete: (id: string) => void }) => {
+    if (accounts.length === 0) return null;
+    return (
+        <div className="space-y-4">
+            <h2 className="text-2xl font-bold font-headline tracking-tight">{title}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {accounts.map(account => <AccountCard key={account.id} account={account} onDelete={onDelete} />)}
+            </div>
+        </div>
+    );
+};
+
 
 export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountChange }) => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
 
-    const totalPatrimony = data.reduce((sum, account) => sum + account.balance, 0);
+    const { groupedAccounts, totalPatrimony } = useMemo(() => {
+        const grouped = data.reduce((acc, account) => {
+            if (!acc[account.type]) {
+                acc[account.type] = [];
+            }
+            acc[account.type].push(account);
+            return acc;
+        }, {} as Record<Account['type'], Account[]>);
+
+        const total = data.reduce((sum, account) => sum + account.balance, 0);
+
+        return { groupedAccounts: grouped, totalPatrimony: total };
+    }, [data]);
+
 
     const handleDeleteRequest = (accountId: string) => {
         setAccountToDelete(accountId);
@@ -107,8 +132,10 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
                 </Dialog>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {data.map(account => <AccountCard key={account.id} account={account} onDelete={handleDeleteRequest} />)}
+            <div className="space-y-8">
+                <AccountGroup title="Cuentas Bancarias" accounts={groupedAccounts.Bank || []} onDelete={handleDeleteRequest} />
+                <AccountGroup title="Billeteras Digitales" accounts={groupedAccounts.Wallet || []} onDelete={handleDeleteRequest} />
+                <AccountGroup title="Efectivo" accounts={groupedAccounts.Cash || []} onDelete={handleDeleteRequest} />
                 
                 {data.length === 0 && (
                     <Card className="card-glassmorphic flex items-center justify-center min-h-[150px] border-dashed rounded-xl col-span-full">
