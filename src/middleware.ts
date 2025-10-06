@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+    // DEVELOPMENT ONLY: Temporarily disable auth to view inner pages
+    return NextResponse.next();
+    
+    /*
     const { pathname } = request.nextUrl;
     // In middleware, we can't access localStorage. We should rely on cookies for session management.
     // The browser will automatically send cookies with each request.
@@ -24,6 +28,7 @@ export function middleware(request: NextRequest) {
 
     // Otherwise, allow the request to proceed.
     return NextResponse.next();
+    */
 }
 
 export const config = {
