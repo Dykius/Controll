@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -189,7 +188,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     <FormControl>
                     <SelectTrigger>
                         <SelectValue placeholder="Selecciona una categoría" />
-                    </Trigger>
+                    </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                     {filteredCategories.map(category => (

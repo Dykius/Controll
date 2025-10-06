@@ -29,3 +29,9 @@ export function formatDate(dateString: string) {
     day: 'numeric',
   });
 }
+
+export function getBudgetStatusColor(progress: number): string {
+    if (progress > 90) return 'hsl(var(--destructive))';
+    if (progress > 75) return 'hsl(28, 80%, 50%)'; // orange
+    return 'hsl(var(--chart-1))'; // green
+}

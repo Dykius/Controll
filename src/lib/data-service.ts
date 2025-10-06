@@ -66,6 +66,9 @@ function getUserData(): UserData {
         if (!user.data.categories || user.data.categories.length === 0) {
             user.data.categories = defaultCategories;
         }
+        if (!user.data.budgets) {
+            user.data.budgets = [];
+        }
         return user.data;
     }
     
@@ -138,6 +141,30 @@ export function getCategories(): Category[] {
 
 export function getBudgets(): Budget[] {
     return getUserData().budgets;
+}
+
+export function addBudget(budget: Omit<Budget, 'id'>) {
+    const data = getUserData();
+    const newBudget: Budget = {
+        ...budget,
+        id: `bud-${new Date().getTime()}`,
+    };
+    const updatedData = { ...data, budgets: [...data.budgets, newBudget] };
+    saveUserData(updatedData);
+}
+
+export function updateBudget(updatedBudget: Budget) {
+    const data = getUserData();
+    const updatedBudgets = data.budgets.map(b => b.id === updatedBudget.id ? updatedBudget : b);
+    const updatedData = { ...data, budgets: updatedBudgets };
+    saveUserData(updatedData);
+}
+
+export function deleteBudget(budgetId: string) {
+    const data = getUserData();
+    const updatedBudgets = data.budgets.filter(b => b.id !== budgetId);
+    const updatedData = { ...data, budgets: updatedBudgets };
+    saveUserData(updatedData);
 }
 
 export function getDashboardData() {
