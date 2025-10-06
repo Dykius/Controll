@@ -2,12 +2,10 @@
 export type Account = {
   id: string;
   name: string;
-  type: 'Bank' | 'Cash' | 'Wallet' | 'Credit Card';
+  type: 'Bank' | 'Cash' | 'Wallet';
   initialBalance: number;
   currency: 'COP';
   balance: number;
-  creditLimit?: number;
-  statementCutOffDay?: number;
 };
 
 export type Transaction = {

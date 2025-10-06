@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { Account, Category } from '@/lib/types';
@@ -57,10 +57,6 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
   });
   
   const transactionType = form.watch('type');
-  const accountId = form.watch('accountId');
-  const selectedAccount = accounts.find(a => a.id === accountId);
-
-  const isCreditCard = selectedAccount?.type === 'Credit Card';
 
   // Filter categories based on transaction type
   const filteredCategories = categories.filter(c => c.type === transactionType);
@@ -69,32 +65,15 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
         const account = accounts.find(a => a.id === values.accountId);
+        if (account && values.type === 'Expense' && account.balance < values.amount) {
+            toast({
+                variant: 'destructive',
+                title: 'Saldo insuficiente',
+                description: `No tienes suficiente saldo en la cuenta "${account.name}".`,
+            });
+            return;
+        }
 
-        // Regular accounts: check for sufficient balance on expenses
-        if (account && account.type !== 'Credit Card' && values.type === 'Expense') {
-            if (account.balance < values.amount) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Saldo insuficiente',
-                    description: `No tienes suficiente saldo en la cuenta "${account.name}".`,
-                });
-                return;
-            }
-        }
-        
-        // Credit cards: check if expense exceeds available credit
-        if (account && account.type === 'Credit Card' && values.type === 'Expense') {
-            const availableCredit = (account.creditLimit ?? 0) - account.balance;
-            if (values.amount > availableCredit) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Límite de crédito excedido',
-                    description: `Esta compra supera tu crédito disponible en la tarjeta "${account.name}".`,
-                });
-                return;
-            }
-        }
-    
         addTransaction({
             ...values,
             date: values.date.toISOString(),
@@ -134,7 +113,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     <FormControl>
                       <RadioGroupItem value="Income" />
                     </FormControl>
-                    <FormLabel className="font-normal">{isCreditCard ? 'Pago a Tarjeta' : 'Ingreso'}</FormLabel>
+                    <FormLabel className="font-normal">Ingreso</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
@@ -189,15 +168,11 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                    {accounts.map(account => {
-                       const isCC = account.type === 'Credit Card';
-                       const available = isCC && account.creditLimit ? account.creditLimit - account.balance : account.balance;
-                       return (
-                         <SelectItem key={account.id} value={account.id}>
-                          {account.name} ({isCC ? 'Disp: ' : ''}{formatCurrency(available)})
-                         </SelectItem>
-                       )
-                    })}
+                    {accounts.map(account => (
+                        <SelectItem key={account.id} value={account.id}>
+                        {account.name}
+                        </SelectItem>
+                    ))}
                     </SelectContent>
                 </Select>
                 <FormMessage />
@@ -283,5 +258,3 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
     </Form>
   );
 }
-
-    
