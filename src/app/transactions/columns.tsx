@@ -6,8 +6,46 @@ import { formatCurrency, formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash2, ArrowDownUp } from "lucide-react"
-import { getCategories, getAccounts } from "@/lib/data-service";
+import { getCategories, getAccounts, deleteTransaction } from "@/lib/data-service";
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+
+
+const ActionCell = ({ row }: { row: any }) => {
+    const router = useRouter();
+    
+    const handleDelete = () => {
+        if (confirm("¿Estás seguro de que quieres eliminar esta transacción?")) {
+            deleteTransaction(row.original.id);
+            router.refresh();
+        }
+    }
+
+    return (
+         <div className="text-right">
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Abrir menú</span>
+                <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                <DropdownMenuItem>
+                <Pencil className="mr-2 h-4 w-4" /> Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="text-destructive focus:text-destructive"
+                    onClick={handleDelete}
+                >
+                <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    )
+}
 
 
 export const columns: ColumnDef<Transaction>[] = [
@@ -69,28 +107,6 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      return (
-        <div className="text-right">
-            <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abrir menú</span>
-                <MoreHorizontal className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                <DropdownMenuItem>
-                <Pencil className="mr-2 h-4 w-4" /> Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive focus:text-destructive">
-                <Trash2 className="mr-2 h-4 w-4" /> Eliminar
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
-      )
-    },
+    cell: ActionCell,
   },
 ]
