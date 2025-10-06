@@ -7,7 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Landmark, PlusCircle, Trash, Wallet } from "lucide-react";
 import type { Account } from "@/lib/types";
-import { deleteAccount, getAccounts } from "@/lib/data-service";
+import { deleteAccount } from "@/lib/data-service";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AccountForm } from "./account-form";
 
