@@ -29,7 +29,10 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data }) => {
     const handleDelete = (accountId: string) => {
         if (confirm("¿Estás seguro de que quieres eliminar esta cuenta? Esto también eliminará todas sus transacciones asociadas.")) {
             deleteAccount(accountId);
-            router.refresh();
+            // Instead of router.refresh(), we can manually update the state to reflect the change immediately
+            // This is a bit more complex, so for now we will refresh the whole page.
+            // A better solution would involve state management (like Zustand or Context)
+            window.location.reload();
         }
     };
 

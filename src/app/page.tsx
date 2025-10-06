@@ -1,3 +1,4 @@
+
 // This component needs to be a client component to access localStorage
 "use client";
 
