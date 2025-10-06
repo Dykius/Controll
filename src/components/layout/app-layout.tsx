@@ -13,6 +13,7 @@ import {
 import { MainNav } from '@/components/layout/main-nav';
 import { AppHeader } from '@/components/layout/app-header';
 import React from 'react';
+import { PlusCircle } from 'lucide-react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -28,14 +29,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <Image 
-            src="/Logo.png" 
-            alt="Control+ Logo" 
-            width={150} 
-            height={36}
-            quality={100}
-            className="group-data-[collapsible=icon]:hidden"
-          />
+           <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
+              <PlusCircle className="h-8 w-8 text-primary" />
+              <span className="text-2xl font-bold">Control+</span>
+            </div>
         </SidebarHeader>
         <SidebarContent className="p-2">
           <MainNav />

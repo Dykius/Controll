@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { AuthCard } from '@/components/auth/auth-card';
 import { BackgroundPattern } from '@/components/auth/background-pattern';
 import { SignUpForm } from './sign-up-form';
+import { PlusCircle } from 'lucide-react';
 
 export default function SignUpPage() {
   return (
@@ -11,13 +11,10 @@ export default function SignUpPage() {
       <div className="relative z-10 w-full">
         <AuthCard
           logo={
-             <Image 
-              src="/Logo.png" 
-              alt="Control+ Logo" 
-              width={180} 
-              height={43}
-              quality={100}
-            />
+            <div className="flex items-center gap-3 text-white">
+              <PlusCircle className="h-10 w-10 text-primary" />
+              <span className="text-4xl font-bold">Control+</span>
+            </div>
           }
           title="Crea tu cuenta"
           subtitle="Empieza a gestionar tus finanzas hoy mismo"
