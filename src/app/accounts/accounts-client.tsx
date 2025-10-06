@@ -79,10 +79,6 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
         onAccountChange();
     }
 
-    const bankAccounts = data.filter(a => a.type === 'Bank');
-    const walletAccounts = data.filter(a => a.type === 'Wallet');
-    const cashAccounts = data.filter(a => a.type === 'Cash');
-
     return (
         <div className="space-y-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -111,39 +107,11 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
                 </Dialog>
             </div>
             
-            <div className="space-y-6">
-                {/* Bank Accounts */}
-                {bankAccounts.length > 0 && (
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold font-headline text-muted-foreground">Cuentas Bancarias</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {bankAccounts.map(account => <AccountCard key={account.id} account={account} onDelete={handleDeleteRequest} />)}
-                        </div>
-                    </div>
-                )}
-                
-                {/* Wallet Accounts */}
-                {walletAccounts.length > 0 && (
-                     <div className="space-y-4">
-                        <h2 className="text-xl font-bold font-headline text-muted-foreground">Billeteras Digitales</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                           {walletAccounts.map(account => <AccountCard key={account.id} account={account} onDelete={handleDeleteRequest} />)}
-                        </div>
-                    </div>
-                )}
-
-                {/* Cash */}
-                {cashAccounts.length > 0 && (
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold font-headline text-muted-foreground">Efectivo</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {cashAccounts.map(account => <AccountCard key={account.id} account={account} onDelete={handleDeleteRequest} />)}
-                        </div>
-                    </div>
-                )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {data.map(account => <AccountCard key={account.id} account={account} onDelete={handleDeleteRequest} />)}
                 
                 {data.length === 0 && (
-                    <Card className="card-glassmorphic flex items-center justify-center min-h-[150px] border-dashed rounded-xl">
+                    <Card className="card-glassmorphic flex items-center justify-center min-h-[150px] border-dashed rounded-xl col-span-full">
                         <div className="flex flex-col h-auto gap-2 text-muted-foreground items-center">
                             <PlusCircle className="h-8 w-8" />
                             <span>Agrega tu primera cuenta para empezar</span>
