@@ -24,6 +24,7 @@ import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
 
 interface BudgetFormProps {
     onSuccess: () => void;
