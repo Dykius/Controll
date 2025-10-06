@@ -54,6 +54,8 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
     defaultValues: {
       name: '',
       initialBalance: 0,
+      creditLimit: undefined,
+      statementCutOffDay: undefined,
     },
   });
   
@@ -140,7 +142,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
                     <FormItem>
                     <FormLabel>Límite de Crédito</FormLabel>
                     <FormControl>
-                        <Input type="number" placeholder="5,000,000" {...field} />
+                        <Input type="number" placeholder="5,000,000" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -153,7 +155,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
                     <FormItem>
                     <FormLabel>Día de Corte</FormLabel>
                     <FormControl>
-                        <Input type="number" placeholder="Ej: 15" {...field} />
+                        <Input type="number" placeholder="Ej: 15" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>

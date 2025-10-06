@@ -62,10 +62,8 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
 
   const isCreditCard = selectedAccount?.type === 'Credit Card';
 
-  // For credit cards, an "Income" transaction is a payment to the card.
-  const filteredCategories = isCreditCard && transactionType === 'Income'
-    ? categories.filter(c => c.type === 'Income' || c.name === 'Pago de Tarjeta') // A specific category for payments
-    : categories.filter(c => c.type === transactionType);
+  // Filter categories based on transaction type
+  const filteredCategories = categories.filter(c => c.type === transactionType);
 
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -216,7 +214,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     <FormControl>
                     <SelectTrigger>
                         <SelectValue placeholder="Selecciona una categoría" />
-                    </SelectTrigger>
+                    </Trigger>
                     </FormControl>
                     <SelectContent>
                     {filteredCategories.map(category => (
