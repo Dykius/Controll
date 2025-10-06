@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -37,7 +38,6 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
     defaultValues: {
       name: '',
       initialBalance: 0,
-      type: 'Bank',
     },
   });
   

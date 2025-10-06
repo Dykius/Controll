@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -59,6 +60,18 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+        if (values.type === 'Expense') {
+            const account = accounts.find(a => a.id === values.accountId);
+            if (account && account.balance < values.amount) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Saldo insuficiente',
+                    description: `No tienes suficiente saldo en la cuenta "${account.name}".`,
+                });
+                return;
+            }
+        }
+    
         addTransaction({
             ...values,
             date: values.date.toISOString(),
@@ -155,7 +168,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                     <SelectContent>
                     {accounts.map(account => (
                         <SelectItem key={account.id} value={account.id}>
-                        {account.name}
+                        {account.name} ({formatCurrency(account.balance)})
                         </SelectItem>
                     ))}
                     </SelectContent>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -51,12 +52,12 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data }) => {
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">{account.name}</p>
-                                <p className="text-2xl font-bold font-headline">{formatCurrency(account.initialBalance)}</p>
+                                <p className="text-2xl font-bold font-headline">{formatCurrency(account.balance)}</p>
                             </div>
                         </CardContent>
                         <div className="p-2 flex justify-end items-center text-muted-foreground">
                             <span className="w-2 h-2 rounded-full bg-green-500 mr-auto ml-2"></span>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(account.id)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleDelete(account.id);}}>
                                 <Trash className="h-4 w-4 text-destructive" />
                             </Button>
                         </div>

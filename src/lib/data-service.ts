@@ -1,3 +1,4 @@
+
 import type { Account, Budget, Category, Transaction } from "./types";
 import { categories as defaultCategories } from './data';
 
@@ -85,16 +86,17 @@ export function getAccounts(): Account[] {
                 if (t.type === 'Income') return acc + t.amount;
                 return acc - t.amount;
             }, account.initialBalance);
-        return { ...account, initialBalance: balance };
+        return { ...account, balance };
     });
 }
 
-export function addAccount(account: Omit<Account, 'id' | 'currency'>) {
+export function addAccount(account: Omit<Account, 'id' | 'currency' | 'balance'>) {
     const data = getUserData();
     const newAccount: Account = {
         ...account,
         id: `acc-${new Date().getTime()}`,
         currency: 'COP',
+        balance: account.initialBalance,
     };
     const updatedData = { ...data, accounts: [...data.accounts, newAccount] };
     saveUserData(updatedData);
@@ -150,7 +152,7 @@ export function getDashboardData() {
     
     const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
     const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
-    const balance = accounts.reduce((sum, acc) => sum + acc.initialBalance, 0);
+    const balance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
     
     return { totalIncome, totalExpense, balance, transactions, categories, accounts };
 }
