@@ -23,6 +23,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { BudgetForm } from "./budget-form";
 import MonthSelector from "./month-selector";
 import type { Budget, Category, Transaction } from "@/lib/types";
+import { addMonths } from "date-fns";
 
 
 const iconMap: { [key: string]: React.ReactNode } = {
@@ -115,10 +116,18 @@ export default function BudgetsPage() {
     refreshData();
   }
 
+  const maxDate = addMonths(new Date(), 3);
+  const minDate = new Date(2020, 0, 1); // Example min date
+
   return (
     <div className="space-y-6">
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <MonthSelector selectedDate={currentDate} onDateChange={setCurrentDate} />
+            <MonthSelector 
+              selectedDate={currentDate} 
+              onDateChange={setCurrentDate}
+              minDate={minDate}
+              maxDate={maxDate}
+            />
              <Dialog open={isFormOpen} onOpenChange={(isOpen) => { setIsFormOpen(isOpen); if (!isOpen) setEditingBudget(null); }}>
                 <DialogTrigger asChild>
                     <Button className="w-full sm:w-auto">
