@@ -22,7 +22,7 @@ import type { Budget } from '@/lib/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, addMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar } from '@/components/ui/calendar';
 
@@ -171,12 +171,13 @@ export function BudgetForm({ onSuccess, budget }: BudgetFormProps) {
                         className="block sm:hidden"
                     />
                     <div className="hidden sm:block">
-                        {/* This part is tricky. A real month picker would be better. */}
-                        {/* For now, we allow day selection, but only use month/year. */}
                         <Calendar
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
+                            disabled={(date) =>
+                                date < new Date(new Date().getFullYear(), new Date().getMonth(), 1) || date > addMonths(new Date(), 3)
+                            }
                             initialFocus
                             locale={es}
                         />
