@@ -2,6 +2,9 @@
 
 Aplicacion para el manejo de finanzas personales con un control personalizado y una interfaz de usuario minimalista. Compatible con cualquier navegador web y diseño responsive para cualquier dispositivo.
 
+### En una frase, nuestro proyecto busca resolver...
+La necesidad de un control financiero personalizado y simple, centralizando la información dispersa del usuario en una única plataforma visual e intuitiva.
+
 ## Tecnologías utilizadas
 
 - Next.js
