@@ -1,5 +1,4 @@
 
-
 export type DebitAccountType = 'Bank' | 'Cash' | 'Wallet';
 export type CreditAccountType = 'Credit Card';
 export type AccountType = DebitAccountType | CreditAccountType;
@@ -20,7 +19,8 @@ export interface CreditAccount extends BaseAccount {
   type: CreditAccountType;
   creditLimit: number;
   closingDate: number; // Day of the month
-  debt: number;
+  initialDebt: number; // The debt at the moment of creation
+  debt: number; // The current calculated debt
 }
 
 export type Account = DebitAccount | CreditAccount;

@@ -81,7 +81,7 @@ function getUserData(): UserData {
 
 export function getAccounts(): Account[] {
     const data = getUserData();
-    // Calculate current balance for each account
+    // Calculate current balance or debt for each account
     return data.accounts.map(account => {
         const relatedTransactions = data.transactions.filter(t => t.accountId === account.id);
 
@@ -92,7 +92,7 @@ export function getAccounts(): Account[] {
                 if (t.type === 'Expense') return acc + t.amount;
                 if (t.type === 'Income') return acc - t.amount;
                 return acc;
-            }, 0);
+            }, creditAccount.initialDebt);
             return { ...creditAccount, debt: Math.max(0, debt) };
         } else {
             const debitAccount = account as DebitAccount;
@@ -115,7 +115,7 @@ export function addAccount(account: Omit<Account, 'id' | 'currency' | 'balance' 
     } as Account;
 
     if (newAccount.type === 'Credit Card') {
-        (newAccount as CreditAccount).debt = 0;
+        (newAccount as CreditAccount).debt = (newAccount as CreditAccount).initialDebt;
     } else {
         (newAccount as DebitAccount).balance = (newAccount as DebitAccount).initialBalance;
     }

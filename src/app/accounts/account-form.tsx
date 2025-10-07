@@ -27,6 +27,7 @@ const formSchema = z.object({
   type: z.enum(['Bank', 'Cash', 'Wallet', 'Credit Card'], { required_error: 'Debes seleccionar un tipo.' }),
   initialBalance: z.coerce.number().optional(),
   creditLimit: z.coerce.number().optional(),
+  initialDebt: z.coerce.number().optional(),
   closingDate: z.coerce.number().optional(),
 }).refine(data => {
     if (data.type !== 'Credit Card') {
@@ -46,6 +47,14 @@ const formSchema = z.object({
     path: ['creditLimit'],
 }).refine(data => {
     if (data.type === 'Credit Card') {
+        return data.initialDebt !== undefined && data.initialDebt >= 0;
+    }
+    return true;
+}, {
+    message: 'La deuda inicial no puede ser negativa.',
+    path: ['initialDebt'],
+}).refine(data => {
+    if (data.type === 'Credit Card') {
         return data.closingDate !== undefined && data.closingDate >= 1 && data.closingDate <= 31;
     }
     return true;
@@ -63,6 +72,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
       name: '',
       initialBalance: 0,
       creditLimit: 0,
+      initialDebt: 0,
       closingDate: 1,
     },
   });
@@ -79,6 +89,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
         if (values.type === 'Credit Card') {
             dataToAdd.creditLimit = values.creditLimit;
             dataToAdd.closingDate = values.closingDate;
+            dataToAdd.initialDebt = values.initialDebt;
         } else {
             dataToAdd.initialBalance = values.initialBalance;
         }
@@ -155,33 +166,48 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
                 )}
             />
         ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-4">
                 <FormField
                     control={form.control}
-                    name="creditLimit"
+                    name="initialDebt"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Límite de Crédito</FormLabel>
+                        <FormLabel>Deuda Inicial</FormLabel>
                         <FormControl>
-                            <Input type="number" placeholder="5,000,000" {...field} value={field.value ?? ''} />
+                            <Input type="number" placeholder="0.00" {...field} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="closingDate"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Día de Corte</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder="Ej: 15" {...field} value={field.value ?? ''} min="1" max="31" />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="creditLimit"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Límite de Crédito</FormLabel>
+                            <FormControl>
+                                <Input type="number" placeholder="5,000,000" {...field} value={field.value ?? ''} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="closingDate"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Día de Corte</FormLabel>
+                            <FormControl>
+                                <Input type="number" placeholder="Ej: 15" {...field} value={field.value ?? ''} min="1" max="31" />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
             </div>
         )}
         
