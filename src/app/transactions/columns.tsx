@@ -1,3 +1,4 @@
+
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
@@ -6,20 +7,21 @@ import { formatCurrency, formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash2, ArrowDownUp } from "lucide-react"
-import { getCategories, getAccounts, deleteTransaction } from "@/lib/data-service";
+import { getCategories, getAccounts } from "@/lib/data-service";
 import { cn } from "@/lib/utils"
-import { useRouter } from "next/navigation"
+import React from "react"
+
+// The actions need to be passed in from the client component that uses the table
+// This is because the actions need access to state setters (for modals, etc.)
+type ActionCellProps = {
+    row: any;
+    onEdit: (transaction: Transaction) => void;
+    onDelete: (transactionId: string) => void;
+};
 
 
-const ActionCell = ({ row }: { row: any }) => {
-    const router = useRouter();
-    
-    const handleDelete = () => {
-        if (confirm("¿Estás seguro de que quieres eliminar esta transacción?")) {
-            deleteTransaction(row.original.id);
-            router.refresh();
-        }
-    }
+const ActionCell: React.FC<ActionCellProps> = ({ row, onEdit, onDelete }) => {
+    const transaction = row.original as Transaction;
 
     return (
          <div className="text-right">
@@ -32,14 +34,14 @@ const ActionCell = ({ row }: { row: any }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                <DropdownMenuItem>
-                <Pencil className="mr-2 h-4 w-4" /> Editar
+                <DropdownMenuItem onClick={() => onEdit(transaction)}>
+                    <Pencil className="mr-2 h-4 w-4" /> Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                     className="text-destructive focus:text-destructive"
-                    onClick={handleDelete}
+                    onClick={() => onDelete(transaction.id)}
                 >
-                <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                    <Trash2 className="mr-2 h-4 w-4" /> Eliminar
                 </DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>
@@ -47,8 +49,11 @@ const ActionCell = ({ row }: { row: any }) => {
     )
 }
 
-
-export const columns: ColumnDef<Transaction>[] = [
+// We need a way to pass the action handlers to the columns
+export const getColumns = (
+    onEdit: (transaction: Transaction) => void,
+    onDelete: (transactionId: string) => void
+): ColumnDef<Transaction>[] => [
   {
     accessorKey: "description",
     header: "Descripción",
@@ -60,7 +65,7 @@ export const columns: ColumnDef<Transaction>[] = [
         return (
              <div className="flex items-center gap-3">
                  <div className="bg-secondary p-2 rounded-full h-8 w-8 flex items-center justify-center">
-                    <span className="font-bold text-xs">{category?.name.charAt(0)}</span>
+                    <span className="font-bold text-xs">{category?.name.charAt(0) || '?'}</span>
                  </div>
                  <div>
                     <div className="font-medium">{row.getValue("description")}</div>
@@ -107,6 +112,6 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     id: "actions",
-    cell: ActionCell,
+    cell: (props) => <ActionCell {...props} onEdit={onEdit} onDelete={onDelete} />,
   },
 ]

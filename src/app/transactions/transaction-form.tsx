@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -23,13 +24,14 @@ import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import type { Account, Category } from '@/lib/types';
-import { addTransaction } from '@/lib/data-service';
+import type { Account, Category, Transaction } from '@/lib/types';
+import { addTransaction, updateTransaction } from '@/lib/data-service';
 
 interface TransactionFormProps {
     accounts: Account[];
     categories: Category[];
     onSuccess: () => void;
+    transaction?: Transaction | null;
 }
 
 const formSchema = z.object({
@@ -41,8 +43,9 @@ const formSchema = z.object({
   categoryId: z.string({ required_error: 'Debes seleccionar una categoría.' }),
 });
 
-export function TransactionForm({ accounts, categories, onSuccess }: TransactionFormProps) {
+export function TransactionForm({ accounts, categories, onSuccess, transaction }: TransactionFormProps) {
   const { toast } = useToast();
+  const isEditMode = !!transaction;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,17 +56,42 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
       date: new Date(),
     },
   });
+
+  useEffect(() => {
+    if (isEditMode && transaction) {
+      form.reset({
+        ...transaction,
+        date: new Date(transaction.date),
+      });
+    } else {
+        form.reset({
+            description: '',
+            amount: 0,
+            type: 'Expense',
+            date: new Date(),
+            accountId: undefined,
+            categoryId: undefined,
+        })
+    }
+  }, [transaction, isEditMode, form]);
   
   const transactionType = form.watch('type');
 
   // Filter categories based on transaction type
   const filteredCategories = categories.filter(c => c.type === transactionType);
 
+  useEffect(() => {
+    // Reset category if it's not valid for the new transaction type
+    if (!filteredCategories.some(c => c.id === form.getValues('categoryId'))) {
+        form.setValue('categoryId', '');
+    }
+  }, [transactionType, filteredCategories, form]);
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
         const account = accounts.find(a => a.id === values.accountId);
-        if (account && values.type === 'Expense' && account.balance < values.amount) {
+        if (!isEditMode && account && values.type === 'Expense' && account.balance < values.amount) {
             toast({
                 variant: 'destructive',
                 title: 'Saldo insuficiente',
@@ -72,20 +100,32 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
             return;
         }
 
-        addTransaction({
-            ...values,
-            date: values.date.toISOString(),
-        });
-      
-        toast({
-          title: '¡Transacción agregada!',
-          description: 'Tu nueva transacción ha sido registrada.',
-      });
+        if (isEditMode && transaction) {
+            updateTransaction({
+                ...transaction,
+                ...values,
+                date: values.date.toISOString(),
+            });
+            toast({
+                title: '¡Transacción actualizada!',
+                description: 'Tu transacción ha sido modificada.',
+            });
+        } else {
+             addTransaction({
+                ...values,
+                date: values.date.toISOString(),
+            });
+            toast({
+              title: '¡Transacción agregada!',
+              description: 'Tu nueva transacción ha sido registrada.',
+            });
+        }
+
       onSuccess();
     } catch (error) {
         toast({
             variant: 'destructive',
-            title: 'Error al agregar',
+            title: 'Error al guardar',
             description: 'Ocurrió un error al registrar tu transacción.',
         });
     }
@@ -104,6 +144,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
                 <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  value={field.value}
                   className="flex space-x-4"
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
@@ -158,7 +199,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
             render={({ field }) => (
                 <FormItem>
                 <FormLabel>Cuenta</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                     <SelectTrigger>
                         <SelectValue placeholder="Selecciona una cuenta" />
@@ -182,7 +223,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
             render={({ field }) => (
                 <FormItem>
                 <FormLabel>Categoría</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                     <SelectTrigger>
                         <SelectValue placeholder="Selecciona una categoría" />
@@ -249,7 +290,7 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
           type="submit"
           className="w-full"
         >
-          Guardar Transacción
+          {isEditMode ? 'Actualizar' : 'Guardar'} Transacción
         </Button>
       </form>
     </Form>

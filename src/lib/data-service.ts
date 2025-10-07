@@ -127,6 +127,15 @@ export function addTransaction(transaction: Omit<Transaction, 'id'>) {
     saveUserData(updatedData);
 }
 
+export function updateTransaction(updatedTransaction: Transaction) {
+    const data = getUserData();
+    const updatedTransactions = data.transactions.map(t => 
+        t.id === updatedTransaction.id ? updatedTransaction : t
+    );
+    const updatedData = { ...data, transactions: updatedTransactions };
+    saveUserData(updatedData);
+}
+
 export function deleteTransaction(transactionId: string) {
     const data = getUserData();
     const updatedTransactions = data.transactions.filter(t => t.id !== transactionId);
