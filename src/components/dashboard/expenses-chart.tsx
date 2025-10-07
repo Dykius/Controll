@@ -16,29 +16,51 @@ interface ExpensesChartProps {
 }
 
 export function ExpensesChart({ transactions, categories }: ExpensesChartProps) {
-  const chartConfig = useMemo(() => {
-    return categories.reduce((acc, category, index) => {
-      acc[category.name] = {
-        label: category.name,
-        color: `hsl(var(--chart-${(index % 5) + 1}))`,
-      };
-      return acc;
-    }, {} as any);
-  }, [categories]);
-
-  const expenseData = useMemo(() => {
-    return categories
-      .filter(c => c.type === 'Expense')
-      .map(category => {
+  const chartData = useMemo(() => {
+    const expenseCategories = categories.filter(c => c.type === 'Expense');
+    
+    return expenseCategories
+      .map((category, index) => {
         const total = transactions
           .filter(t => t.categoryId === category.id && t.type === 'Expense')
           .reduce((sum, t) => sum + t.amount, 0);
-        return { name: category.name, value: total, fill: chartConfig[category.name]?.color };
+        
+        // Base colors from CSS variables
+        const baseColorsCount = 5;
+        const colorIndex = (index % baseColorsCount) + 1;
+        let color;
+
+        if (index < baseColorsCount) {
+            // Use predefined CSS variables for the first 5 categories
+            color = `hsl(var(--chart-${colorIndex}))`;
+        } else {
+            // Generate a dynamic color for additional categories
+            const hue = (index * 360 / (expenseCategories.length > baseColorsCount ? expenseCategories.length : 8)) % 360;
+            color = `hsl(${hue}, 70%, 50%)`;
+        }
+
+        return { 
+          name: category.name, 
+          value: total, 
+          fill: color,
+          label: category.name
+        };
       })
       .filter(item => item.value > 0);
-  }, [transactions, categories, chartConfig]);
+  }, [transactions, categories]);
 
-  if (expenseData.length === 0) {
+  const chartConfig = useMemo(() => {
+    return chartData.reduce((acc, item) => {
+        acc[item.name] = {
+            label: item.label,
+            color: item.fill
+        };
+        return acc;
+    }, {} as any);
+  }, [chartData]);
+
+
+  if (chartData.length === 0) {
     return (
       <div className="flex h-[300px] w-full items-center justify-center">
         <p className="text-sm text-muted-foreground">No hay datos de gastos para mostrar.</p>
@@ -55,8 +77,8 @@ export function ExpensesChart({ transactions, categories }: ExpensesChartProps) 
                     cursor={false}
                     content={<ChartTooltipContent hideLabel formatter={(value) => formatCurrency(value as number)} />}
                 />
-                <Pie data={expenseData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90}>
-                     {expenseData.map((entry) => (
+                <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90}>
+                     {chartData.map((entry) => (
                         <Cell key={`cell-${entry.name}`} fill={entry.fill} />
                     ))}
                 </Pie>

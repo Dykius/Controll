@@ -32,8 +32,11 @@
     --input: 240 10% 8% / 0.5;
     --ring: 258 100% 79%; /* Lighter purple for focus */
     
-    --chart-1: 151 70% 50%; /* #1CE78A - Green for income */
-    --chart-2: 326 100% 74%; /* #FF79D1 - Pink for expense */
+    --chart-1: 151 70% 50%; /* Green */
+    --chart-2: 326 100% 74%; /* Pink */
+    --chart-3: 200 100% 50%; /* Blue */
+    --chart-4: 45 100% 50%; /* Yellow */
+    --chart-5: 25 100% 60%; /* Orange */
   }
   .dark {
     --background: 198 60% 3%; /* #0B0C10 */
@@ -57,6 +60,9 @@
     --ring: 258 100% 79%;
     --chart-1: 151 70% 50%;
     --chart-2: 326 100% 74%;
+    --chart-3: 200 100% 50%;
+    --chart-4: 45 100% 50%;
+    --chart-5: 25 100% 60%;
   }
 }
 
