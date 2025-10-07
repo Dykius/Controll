@@ -74,7 +74,7 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, on
         setIsAlertOpen(false);
     };
 
-    const columns = useMemo(() => getColumns(handleEdit, handleDeleteRequest), []);
+    const columns = useMemo(() => getColumns(handleEdit, handleDeleteRequest), [onTransactionChange]);
 
     const openAddNew = () => {
         setEditingTransaction(null);
@@ -126,7 +126,7 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, on
                 <DataTable columns={columns} data={filteredData} />
             </div>
 
-            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <Dialog open={isFormOpen} onOpenChange={(isOpen) => { setIsFormOpen(isOpen); if (!isOpen) setEditingTransaction(null); }}>
                 <DialogContent className="card-glassmorphic">
                     <DialogHeader>
                         <DialogTitle className="font-headline">
@@ -145,9 +145,9 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, on
             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
+                    <AlertDialogTitle>Estas realmente seguro?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Esta acción no se puede deshacer. Esto eliminará permanentemente la transacción.
+                        esto eliminara la transaccion. Esta accion es completamente irreversible.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
