@@ -1,12 +1,30 @@
 
-export type Account = {
+
+export type DebitAccountType = 'Bank' | 'Cash' | 'Wallet';
+export type CreditAccountType = 'Credit Card';
+export type AccountType = DebitAccountType | CreditAccountType;
+
+interface BaseAccount {
   id: string;
   name: string;
-  type: 'Bank' | 'Cash' | 'Wallet';
-  initialBalance: number;
   currency: 'COP';
+}
+
+export interface DebitAccount extends BaseAccount {
+  type: DebitAccountType;
+  initialBalance: number;
   balance: number;
-};
+}
+
+export interface CreditAccount extends BaseAccount {
+  type: CreditAccountType;
+  creditLimit: number;
+  closingDate: number; // Day of the month
+  debt: number;
+}
+
+export type Account = DebitAccount | CreditAccount;
+
 
 export type Transaction = {
   id: string;

@@ -1,5 +1,6 @@
 
-import type { Account, Budget, Category, Transaction } from "./types";
+
+import type { Account, Budget, Category, Transaction, DebitAccount, CreditAccount } from "./types";
 import { categories as defaultCategories } from './data';
 
 type UserData = {
@@ -82,24 +83,43 @@ export function getAccounts(): Account[] {
     const data = getUserData();
     // Calculate current balance for each account
     return data.accounts.map(account => {
-        const balance = data.transactions
-            .filter(t => t.accountId === account.id)
-            .reduce((acc, t) => {
+        const relatedTransactions = data.transactions.filter(t => t.accountId === account.id);
+
+        if (account.type === 'Credit Card') {
+            const creditAccount = account as CreditAccount;
+            const debt = relatedTransactions.reduce((acc, t) => {
+                // Expenses increase debt, Income (payments) decrease debt
+                if (t.type === 'Expense') return acc + t.amount;
+                if (t.type === 'Income') return acc - t.amount;
+                return acc;
+            }, 0);
+            return { ...creditAccount, debt: Math.max(0, debt) };
+        } else {
+            const debitAccount = account as DebitAccount;
+            const balance = relatedTransactions.reduce((acc, t) => {
                 if (t.type === 'Income') return acc + t.amount;
                 return acc - t.amount;
-            }, account.initialBalance);
-        return { ...account, balance };
+            }, debitAccount.initialBalance);
+             return { ...debitAccount, balance };
+        }
     });
 }
 
-export function addAccount(account: Omit<Account, 'id' | 'currency' | 'balance'>) {
+export function addAccount(account: Omit<Account, 'id' | 'currency' | 'balance' | 'debt'>) {
     const data = getUserData();
+    
     const newAccount: Account = {
         ...account,
         id: `acc-${new Date().getTime()}`,
         currency: 'COP',
-        balance: account.initialBalance,
-    };
+    } as Account;
+
+    if (newAccount.type === 'Credit Card') {
+        (newAccount as CreditAccount).debt = 0;
+    } else {
+        (newAccount as DebitAccount).balance = (newAccount as DebitAccount).initialBalance;
+    }
+
     const updatedData = { ...data, accounts: [...data.accounts, newAccount] };
     saveUserData(updatedData);
 }
@@ -188,7 +208,7 @@ export function getDashboardData() {
     const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
     const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
     
-    const balance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+    const balance = accounts.filter(acc => acc.type !== 'Credit Card').reduce((sum, acc) => sum + (acc as DebitAccount).balance, 0);
     
     return { totalIncome, totalExpense, balance, transactions, categories, accounts };
 }

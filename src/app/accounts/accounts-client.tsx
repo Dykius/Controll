@@ -3,10 +3,10 @@
 
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getBudgetStatusColor } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Landmark, PlusCircle, Trash, Wallet, Coins } from "lucide-react";
-import type { Account } from "@/lib/types";
+import { Landmark, PlusCircle, Trash, Wallet, Coins, CreditCard as CreditCardIcon } from "lucide-react";
+import type { Account, DebitAccount, CreditAccount } from "@/lib/types";
 import { deleteAccount } from "@/lib/data-service";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AccountForm } from "./account-form";
@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Progress } from "@/components/ui/progress";
 
 interface AccountsClientProps {
     data: Account[];
@@ -30,9 +31,10 @@ const accountIcons = {
     Bank: <Landmark className="h-8 w-8 text-muted-foreground" />,
     Wallet: <Wallet className="h-8 w-8 text-muted-foreground" />,
     Cash: <Coins className="h-8 w-8 text-muted-foreground" />,
+    "Credit Card": <CreditCardIcon className="h-8 w-8 text-muted-foreground" />,
 }
 
-const AccountCard = ({ account, onDelete }: { account: Account, onDelete: (id: string) => void }) => (
+const AccountCard = ({ account, onDelete }: { account: DebitAccount, onDelete: (id: string) => void }) => (
     <Card className="card-glassmorphic flex flex-col justify-between min-h-[150px] rounded-xl">
         <CardContent className="p-4 flex-1 flex flex-col justify-between">
             <div className="flex items-start justify-between">
@@ -52,13 +54,45 @@ const AccountCard = ({ account, onDelete }: { account: Account, onDelete: (id: s
     </Card>
 );
 
+const CreditCardCard = ({ account, onDelete }: { account: CreditAccount, onDelete: (id: string) => void }) => {
+    const usagePercentage = account.creditLimit > 0 ? (account.debt / account.creditLimit) * 100 : 0;
+    const progressColor = getBudgetStatusColor(usagePercentage);
+
+    return (
+    <Card className="card-glassmorphic flex flex-col justify-between min-h-[180px] rounded-xl">
+        <CardContent className="p-4 flex-1 flex flex-col justify-between space-y-2">
+            <div className="flex items-start justify-between">
+                {accountIcons[account.type]}
+                <p className="text-xs text-muted-foreground">Corte: Día {account.closingDate}</p>
+            </div>
+            <div>
+                <p className="text-sm text-muted-foreground">{account.name}</p>
+                <p className="text-2xl font-bold font-headline">{formatCurrency(account.debt)}</p>
+                 <Progress value={usagePercentage} className="h-2 mt-2" style={{ '--progress-color': progressColor } as React.CSSProperties} />
+                <p className="text-xs text-muted-foreground mt-1">Límite: {formatCurrency(account.creditLimit)}</p>
+            </div>
+        </CardContent>
+        <div className="p-2 flex justify-end items-center text-muted-foreground">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onDelete(account.id)}>
+                <Trash className="h-4 w-4 text-destructive" />
+            </Button>
+        </div>
+    </Card>
+)};
+
+
 const AccountGroup = ({ title, accounts, onDelete }: { title: string; accounts: Account[]; onDelete: (id: string) => void }) => {
     if (accounts.length === 0) return null;
     return (
         <div className="space-y-4">
             <h2 className="text-2xl font-bold font-headline tracking-tight">{title}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {accounts.map(account => <AccountCard key={account.id} account={account} onDelete={onDelete} />)}
+                {accounts.map(account => {
+                    if (account.type === 'Credit Card') {
+                        return <CreditCardCard key={account.id} account={account as CreditAccount} onDelete={onDelete} />
+                    }
+                    return <AccountCard key={account.id} account={account as DebitAccount} onDelete={onDelete} />
+                })}
             </div>
         </div>
     );
@@ -78,8 +112,9 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
             acc[account.type].push(account);
             return acc;
         }, {} as Record<Account['type'], Account[]>);
-
-        const total = data.reduce((sum, account) => sum + account.balance, 0);
+        
+        const debitAccounts = data.filter(acc => acc.type !== 'Credit Card') as DebitAccount[];
+        const total = debitAccounts.reduce((sum, account) => sum + account.balance, 0);
 
         return { groupedAccounts: grouped, totalPatrimony: total };
     }, [data]);
@@ -110,7 +145,7 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
                 <Card className="card-glassmorphic rounded-xl">
                     <CardHeader>
                         <CardTitle className="font-headline text-lg">Patrimonio Total</CardTitle>
-                        <CardDescription>Suma de todas tus cuentas</CardDescription>
+                        <CardDescription>Suma de todas tus cuentas de débito</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <p className="text-4xl font-bold">{formatCurrency(totalPatrimony)}</p>
@@ -134,6 +169,7 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
             
             <div className="space-y-8">
                 <AccountGroup title="Cuentas Bancarias" accounts={groupedAccounts.Bank || []} onDelete={handleDeleteRequest} />
+                <AccountGroup title="Tarjetas de Crédito" accounts={groupedAccounts['Credit Card'] || []} onDelete={handleDeleteRequest} />
                 <AccountGroup title="Billeteras Digitales" accounts={groupedAccounts.Wallet || []} onDelete={handleDeleteRequest} />
                 <AccountGroup title="Efectivo" accounts={groupedAccounts.Cash || []} onDelete={handleDeleteRequest} />
                 
