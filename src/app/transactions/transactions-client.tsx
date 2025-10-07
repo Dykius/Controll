@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -15,9 +16,10 @@ import { getAccounts, getCategories } from '@/lib/data-service';
 
 interface TransactionsClientProps {
     data: Transaction[];
+    onTransactionChange: () => void;
 }
 
-export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data }) => {
+export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, onTransactionChange }) => {
     const [filter, setFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
     const [categoryFilter, setCategoryFilter] = useState('all');
@@ -33,6 +35,11 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data }) 
         const categoryMatch = categoryFilter === 'all' || item.categoryId === categoryFilter;
         return descriptionMatch && typeMatch && categoryMatch;
     });
+
+    const handleSuccess = () => {
+        setIsFormOpen(false);
+        onTransactionChange();
+    };
 
     return (
         <div className="space-y-6">
@@ -88,7 +95,7 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data }) 
                     <TransactionForm 
                         accounts={accounts} 
                         categories={categories} 
-                        onSuccess={() => setIsFormOpen(false)}
+                        onSuccess={handleSuccess}
                     />
                 </DialogContent>
             </Dialog>

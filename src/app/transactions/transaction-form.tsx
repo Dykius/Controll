@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -14,7 +15,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -43,7 +43,6 @@ const formSchema = z.object({
 
 export function TransactionForm({ accounts, categories, onSuccess }: TransactionFormProps) {
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -82,7 +81,6 @@ export function TransactionForm({ accounts, categories, onSuccess }: Transaction
           title: '¡Transacción agregada!',
           description: 'Tu nueva transacción ha sido registrada.',
       });
-      router.refresh();
       onSuccess();
     } catch (error) {
         toast({

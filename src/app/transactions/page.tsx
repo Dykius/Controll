@@ -10,9 +10,13 @@ export default function TransactionsPage() {
   const [data, setData] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const refreshTransactions = () => {
     const transactionData = getTransactions();
     setData(transactionData);
+  }
+
+  useEffect(() => {
+    refreshTransactions();
     setIsLoading(false);
   }, []);
   
@@ -20,5 +24,5 @@ export default function TransactionsPage() {
     return <div>Cargando transacciones...</div>;
   }
   
-  return <TransactionsClient data={data} />;
+  return <TransactionsClient data={data} onTransactionChange={refreshTransactions} />;
 }
