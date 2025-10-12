@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -36,34 +37,33 @@ export function SignInForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // This logic runs on the client-side
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
-    const user = users[values.email];
+    try {
+        const response = await fetch('/api/auth/sign-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(values)
+        });
 
-    if (user && user.password === values.password) {
-        const sessionPayload = { email: values.email, name: user.fullName };
-        
-        // Use localStorage for client-side session state
-        localStorage.setItem('session', JSON.stringify(sessionPayload));
+        const data = await response.json();
 
-        // For the middleware, we still need a cookie.
-        // The middleware only cares if the cookie exists, not the content for this simulation.
-        document.cookie = `session=true; path=/; max-age=86400`; // Expires in 24 hours
+        if (!response.ok) {
+            throw new Error(data.error || 'Credenciales inválidas.');
+        }
 
+        // Si la autenticación es exitosa, el servidor habrá establecido la cookie de sesión.
         toast({
             title: 'Inicio de sesión exitoso',
-            description: `¡Bienvenido de nuevo, ${user.fullName}!`,
+            description: `¡Bienvenido de nuevo, ${data.user.fullName}!`,
         });
         
-        // Use Next.js router for navigation. This is more reliable.
         router.push('/');
-        router.refresh(); // This ensures the page re-renders with the new state.
+        router.refresh();
 
-    } else {
+    } catch (error: any) {
         toast({
             variant: 'destructive',
             title: 'Error de autenticación',
-            description: 'Credenciales inválidas.',
+            description: error.message,
         });
     }
   }

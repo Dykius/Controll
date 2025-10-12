@@ -1,14 +1,38 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getCategories } from "@/lib/data-service";
 import { Badge } from "@/components/ui/badge";
+import type { Category } from "@/lib/types";
 
 export default function CategoriesPage() {
-  const categories = getCategories();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      try {
+        const categoriesData = await getCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const incomeCategories = categories.filter(c => c.type === 'Income');
   const expenseCategories = categories.filter(c => c.type === 'Expense');
+
+  if (isLoading) {
+    return <div>Cargando categorías...</div>
+  }
 
   return (
     <div className="space-y-8">

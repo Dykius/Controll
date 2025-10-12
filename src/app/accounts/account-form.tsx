@@ -25,42 +25,42 @@ interface AccountFormProps {
 const formSchema = z.object({
   name: z.string().min(2, { message: 'El nombre es muy corto.' }),
   type: z.enum(['Bank', 'Cash', 'Wallet', 'Credit Card'], { required_error: 'Debes seleccionar un tipo.' }),
-  initialBalance: z.coerce.number().optional(),
-  creditLimit: z.coerce.number().optional(),
-  initialDebt: z.coerce.number().optional(),
-  closingDate: z.coerce.number().optional(),
+  initial_balance: z.coerce.number().optional(),
+  credit_limit: z.coerce.number().optional(),
+  initial_debt: z.coerce.number().optional(),
+  closing_date: z.coerce.number().optional(),
 }).refine(data => {
     if (data.type !== 'Credit Card') {
-        return data.initialBalance !== undefined && data.initialBalance >= 0;
+        return data.initial_balance !== undefined && data.initial_balance >= 0;
     }
     return true;
 }, {
     message: 'El saldo inicial no puede ser negativo.',
-    path: ['initialBalance'],
+    path: ['initial_balance'],
 }).refine(data => {
     if (data.type === 'Credit Card') {
-        return data.creditLimit !== undefined && data.creditLimit > 0;
+        return data.credit_limit !== undefined && data.credit_limit > 0;
     }
     return true;
 }, {
     message: 'El límite de crédito debe ser positivo.',
-    path: ['creditLimit'],
+    path: ['credit_limit'],
 }).refine(data => {
     if (data.type === 'Credit Card') {
-        return data.initialDebt !== undefined && data.initialDebt >= 0;
+        return data.initial_debt !== undefined && data.initial_debt >= 0;
     }
     return true;
 }, {
     message: 'La deuda inicial no puede ser negativa.',
-    path: ['initialDebt'],
+    path: ['initial_debt'],
 }).refine(data => {
     if (data.type === 'Credit Card') {
-        return data.closingDate !== undefined && data.closingDate >= 1 && data.closingDate <= 31;
+        return data.closing_date !== undefined && data.closing_date >= 1 && data.closing_date <= 31;
     }
     return true;
 }, {
     message: 'El día de corte debe ser entre 1 y 31.',
-    path: ['closingDate'],
+    path: ['closing_date'],
 });
 
 export function AccountForm({ onSuccess }: AccountFormProps) {
@@ -70,31 +70,40 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      initialBalance: 0,
-      creditLimit: 0,
-      initialDebt: 0,
-      closingDate: 1,
+      initial_balance: 0,
+      credit_limit: 0,
+      initial_debt: 0,
+      closing_date: 1,
     },
   });
 
   const accountType = form.watch('type');
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+        // En una app real, el user_id vendría de la sesión
+        const user_id = 1;
+
         const dataToAdd: any = {
             name: values.name,
             type: values.type,
+            user_id: user_id,
+            currency: 'COP',
         };
 
         if (values.type === 'Credit Card') {
-            dataToAdd.creditLimit = values.creditLimit;
-            dataToAdd.closingDate = values.closingDate;
-            dataToAdd.initialDebt = values.initialDebt;
+            dataToAdd.credit_limit = values.credit_limit;
+            dataToAdd.closing_date = values.closing_date;
+            dataToAdd.initial_debt = values.initial_debt;
+            dataToAdd.initial_balance = 0; // No aplica para TC
         } else {
-            dataToAdd.initialBalance = values.initialBalance;
+            dataToAdd.initial_balance = values.initial_balance;
+            dataToAdd.credit_limit = 0;
+            dataToAdd.closing_date = null;
+            dataToAdd.initial_debt = 0;
         }
 
-        addAccount(dataToAdd);
+        await addAccount(dataToAdd);
       
         toast({
           title: '¡Cuenta agregada!',
@@ -154,7 +163,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
         {accountType !== 'Credit Card' ? (
              <FormField
                 control={form.control}
-                name="initialBalance"
+                name="initial_balance"
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>Saldo Inicial</FormLabel>
@@ -169,7 +178,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
             <div className="space-y-4">
                 <FormField
                     control={form.control}
-                    name="initialDebt"
+                    name="initial_debt"
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Deuda Inicial</FormLabel>
@@ -183,7 +192,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                         control={form.control}
-                        name="creditLimit"
+                        name="credit_limit"
                         render={({ field }) => (
                             <FormItem>
                             <FormLabel>Límite de Crédito</FormLabel>
@@ -196,7 +205,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
                     />
                     <FormField
                         control={form.control}
-                        name="closingDate"
+                        name="closing_date"
                         render={({ field }) => (
                             <FormItem>
                             <FormLabel>Día de Corte</FormLabel>

@@ -1,33 +1,3 @@
-// Actualizar presupuesto
-export async function PUT(request: NextRequest) {
-  try {
-    const { id, category_id, user_id, amount, month } = await request.json();
-    await pool.query(
-      "UPDATE budgets SET category_id = ?, user_id = ?, amount = ?, month = ? WHERE id = ?",
-      [category_id, user_id, amount, month, id]
-    );
-    return NextResponse.json({ message: "Presupuesto actualizado" });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Error al actualizar presupuesto", details: error },
-      { status: 500 }
-    );
-  }
-}
-
-// Eliminar presupuesto
-export async function DELETE(request: NextRequest) {
-  try {
-    const { id } = await request.json();
-    await pool.query("DELETE FROM budgets WHERE id = ?", [id]);
-    return NextResponse.json({ message: "Presupuesto eliminado" });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Error al eliminar presupuesto", details: error },
-      { status: 500 }
-    );
-  }
-}
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 
@@ -42,9 +12,9 @@ export async function GET(request: NextRequest) {
       user_id,
     ]);
     return NextResponse.json(rows);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al obtener presupuestos", details: error },
+      { error: "Error al obtener presupuestos", details: error.message },
       { status: 500 }
     );
   }
@@ -62,9 +32,40 @@ export async function POST(request: NextRequest) {
       { message: "Presupuesto creado" },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al crear presupuesto", details: error },
+      { error: "Error al crear presupuesto", details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+// Actualizar presupuesto
+export async function PUT(request: NextRequest) {
+  try {
+    const { id, category_id, user_id, amount, month } = await request.json();
+    await pool.query(
+      "UPDATE budgets SET category_id = ?, user_id = ?, amount = ?, month = ? WHERE id = ?",
+      [category_id, user_id, amount, month, id]
+    );
+    return NextResponse.json({ message: "Presupuesto actualizado" });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: "Error al actualizar presupuesto", details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+// Eliminar presupuesto
+export async function DELETE(request: NextRequest) {
+  try {
+    const { id } = await request.json();
+    await pool.query("DELETE FROM budgets WHERE id = ?", [id]);
+    return NextResponse.json({ message: "Presupuesto eliminado" });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: "Error al eliminar presupuesto", details: error.message },
       { status: 500 }
     );
   }

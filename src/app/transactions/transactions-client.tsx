@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { TransactionForm } from './transaction-form';
-import { getAccounts, getCategories, deleteTransaction } from '@/lib/data-service';
+import { deleteTransaction } from '@/lib/data-service';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,13 +23,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
 
 interface TransactionsClientProps {
     data: Transaction[];
+    accounts: Account[];
+    categories: Category[];
     onTransactionChange: () => void;
 }
 
-export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, onTransactionChange }) => {
+export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, accounts, categories, onTransactionChange }) => {
     const [filter, setFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
     const [categoryFilter, setCategoryFilter] = useState('all');
@@ -37,17 +40,14 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, on
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
-    
-    // We need to get the latest data for the form
-    const accounts = getAccounts();
-    const categories = getCategories();
+    const { toast } = useToast();
 
-    const filteredData = data.filter(item => {
+    const filteredData = useMemo(() => data.filter(item => {
         const descriptionMatch = item.description.toLowerCase().includes(filter.toLowerCase());
         const typeMatch = typeFilter === 'all' || item.type === (typeFilter === 'income' ? 'Income' : 'Expense');
         const categoryMatch = categoryFilter === 'all' || item.categoryId === categoryFilter;
         return descriptionMatch && typeMatch && categoryMatch;
-    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()), [data, filter, typeFilter, categoryFilter]);
 
     const handleSuccess = () => {
         setIsFormOpen(false);
@@ -65,16 +65,21 @@ export const TransactionsClient: React.FC<TransactionsClientProps> = ({ data, on
         setIsAlertOpen(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (transactionToDelete) {
-            deleteTransaction(transactionToDelete);
-            onTransactionChange();
-            setTransactionToDelete(null);
+            try {
+                await deleteTransaction(transactionToDelete);
+                onTransactionChange();
+                setTransactionToDelete(null);
+                toast({ title: "Transacción eliminada" });
+            } catch (error) {
+                toast({ variant: 'destructive', title: "Error", description: "No se pudo eliminar la transacción." });
+            }
         }
         setIsAlertOpen(false);
     };
 
-    const columns = useMemo(() => getColumns(handleEdit, handleDeleteRequest), [onTransactionChange]);
+    const columns = useMemo(() => getColumns(handleEdit, handleDeleteRequest, categories, accounts), [categories, accounts, onTransactionChange]);
 
     const openAddNew = () => {
         setEditingTransaction(null);

@@ -1,5 +1,4 @@
 
-// This component needs to be a client component to access localStorage
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,29 +8,41 @@ import { ExpensesChart } from "@/components/dashboard/expenses-chart";
 import { formatCurrency } from "@/lib/utils";
 import { getDashboardData } from "@/lib/data-service";
 import { useState, useEffect } from "react";
+import type { Account, Category, Transaction } from "@/lib/types";
 
-// Define a type for your dashboard data
 type DashboardData = {
     totalIncome: number;
     totalExpense: number;
     balance: number;
-    transactions: any[]; // Replace 'any' with your Transaction type
-    categories: any[]; // Replace 'any' with your Category type
-    accounts: any[]; // Replace 'any' with your Account type
+    transactions: Transaction[];
+    categories: Category[];
+    accounts: Account[];
 };
 
 
 export default function DashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Data fetching now happens on the client, inside useEffect
-        const dashboardData = getDashboardData();
-        setData(dashboardData);
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                // En una app real, el user_id vendría de la sesión
+                const user_id = 1;
+                const dashboardData = await getDashboardData(user_id);
+                setData(dashboardData);
+            } catch (error) {
+                console.error("Failed to fetch dashboard data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
-    // Render a loading state while data is being fetched
-    if (!data) {
+    if (isLoading || !data) {
         return <div>Cargando...</div>;
     }
 

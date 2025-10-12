@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -16,7 +17,7 @@ import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { categories as defaultCategories } from '@/lib/data';
+import { registerUser } from '@/lib/data-service';
 
 const formSchema = z
   .object({
@@ -48,40 +49,18 @@ export function SignUpForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-        const users = JSON.parse(localStorage.getItem('users') || '{}');
-        
-        if (users[values.email]) {
-            toast({
-                variant: 'destructive',
-                title: 'Error de registro',
-                description: 'Este correo electrónico ya está en uso.',
-            });
-            return;
-        }
-
-        users[values.email] = {
-            fullName: values.fullName,
-            password: values.password,
-            data: {
-                accounts: [],
-                transactions: [],
-                categories: defaultCategories, // Start with default categories
-                budgets: [],
-            }
-        };
-
-        localStorage.setItem('users', JSON.stringify(users));
+        await registerUser(values.fullName, values.email, values.password);
       
         toast({
           title: '¡Cuenta creada!',
           description: 'Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión.',
       });
       router.push('/auth/sign-in');
-    } catch (error) {
+    } catch (error: any) {
         toast({
             variant: 'destructive',
             title: 'Error de registro',
-            description: 'Ocurrió un error al crear tu cuenta.',
+            description: error.message || 'Ocurrió un error al crear tu cuenta.',
         });
     }
   }

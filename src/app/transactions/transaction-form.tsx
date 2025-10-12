@@ -61,6 +61,7 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
     if (isEditMode && transaction) {
       form.reset({
         ...transaction,
+        amount: Number(transaction.amount),
         date: new Date(transaction.date),
       });
     } else {
@@ -77,43 +78,35 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
   
   const transactionType = form.watch('type');
 
-  // Filter categories based on transaction type
   const filteredCategories = categories.filter(c => c.type === transactionType);
 
   useEffect(() => {
-    // Reset category if it's not valid for the new transaction type
     if (!filteredCategories.some(c => c.id === form.getValues('categoryId'))) {
         form.setValue('categoryId', '');
     }
   }, [transactionType, filteredCategories, form]);
 
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-        const account = accounts.find(a => a.id === values.accountId);
-        if (!isEditMode && account && values.type === 'Expense' && account.balance < values.amount) {
-            toast({
-                variant: 'destructive',
-                title: 'Saldo insuficiente',
-                description: `No tienes suficiente saldo en la cuenta "${account.name}".`,
-            });
-            return;
-        }
+        const user_id = 1; // En app real, obtener de la sesión
+        const dateISO = values.date.toISOString();
 
         if (isEditMode && transaction) {
-            updateTransaction({
+            await updateTransaction({
                 ...transaction,
                 ...values,
-                date: values.date.toISOString(),
+                date: dateISO,
             });
             toast({
                 title: '¡Transacción actualizada!',
                 description: 'Tu transacción ha sido modificada.',
             });
         } else {
-             addTransaction({
+             await addTransaction({
                 ...values,
-                date: values.date.toISOString(),
+                user_id,
+                date: dateISO,
             });
             toast({
               title: '¡Transacción agregada!',

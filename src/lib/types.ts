@@ -7,20 +7,22 @@ interface BaseAccount {
   id: string;
   name: string;
   currency: 'COP';
+  type: AccountType;
+  user_id: number;
 }
 
 export interface DebitAccount extends BaseAccount {
   type: DebitAccountType;
-  initialBalance: number;
-  balance: number;
+  initial_balance: number;
+  balance: number; // Campo calculado dinámicamente
 }
 
 export interface CreditAccount extends BaseAccount {
   type: CreditAccountType;
-  creditLimit: number;
-  closingDate: number; // Day of the month
-  initialDebt: number; // The debt at the moment of creation
-  debt: number; // The current calculated debt
+  credit_limit: number;
+  closing_date: number;
+  initial_debt: number;
+  debt: number; // Campo calculado dinámicamente
 }
 
 export type Account = DebitAccount | CreditAccount;
@@ -34,6 +36,7 @@ export type Transaction = {
   amount: number;
   type: 'Income' | 'Expense';
   categoryId: string;
+  user_id: number;
 };
 
 export type Category = {
@@ -48,4 +51,5 @@ export type Budget = {
   categoryId: string;
   amount: number;
   month: string; // YYYY-MM
+  user_id: number;
 };

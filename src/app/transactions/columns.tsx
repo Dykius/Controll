@@ -2,17 +2,14 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Transaction } from "@/lib/types"
+import { Transaction, Category, Account } from "@/lib/types"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash2, ArrowDownUp } from "lucide-react"
-import { getCategories, getAccounts } from "@/lib/data-service";
 import { cn } from "@/lib/utils"
 import React from "react"
 
-// The actions need to be passed in from the client component that uses the table
-// This is because the actions need access to state setters (for modals, etc.)
 type ActionCellProps = {
     row: any;
     onEdit: (transaction: Transaction) => void;
@@ -49,17 +46,16 @@ const ActionCell: React.FC<ActionCellProps> = ({ row, onEdit, onDelete }) => {
     )
 }
 
-// We need a way to pass the action handlers to the columns
 export const getColumns = (
     onEdit: (transaction: Transaction) => void,
-    onDelete: (transactionId: string) => void
+    onDelete: (transactionId: string) => void,
+    categories: Category[],
+    accounts: Account[]
 ): ColumnDef<Transaction>[] => [
   {
     accessorKey: "description",
     header: "Descripción",
     cell: ({ row }) => {
-        const categories = getCategories();
-        const accounts = getAccounts();
         const category = categories.find(c => c.id === row.original.categoryId);
         const account = accounts.find(a => a.id === row.original.accountId);
         return (

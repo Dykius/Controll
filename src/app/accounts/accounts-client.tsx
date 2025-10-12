@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 
 interface AccountsClientProps {
     data: Account[];
@@ -55,7 +56,7 @@ const AccountCard = ({ account, onDelete }: { account: DebitAccount, onDelete: (
 );
 
 const CreditCardCard = ({ account, onDelete }: { account: CreditAccount, onDelete: (id: string) => void }) => {
-    const usagePercentage = account.creditLimit > 0 ? (account.debt / account.creditLimit) * 100 : 0;
+    const usagePercentage = account.credit_limit > 0 ? (account.debt / account.credit_limit) * 100 : 0;
     const progressColor = getBudgetStatusColor(usagePercentage);
 
     return (
@@ -63,13 +64,13 @@ const CreditCardCard = ({ account, onDelete }: { account: CreditAccount, onDelet
         <CardContent className="p-4 flex-1 flex flex-col justify-between space-y-2">
             <div className="flex items-start justify-between">
                 {accountIcons[account.type]}
-                <p className="text-xs text-muted-foreground">Corte: Día {account.closingDate}</p>
+                <p className="text-xs text-muted-foreground">Corte: Día {account.closing_date}</p>
             </div>
             <div>
                 <p className="text-sm text-muted-foreground">{account.name}</p>
                 <p className="text-2xl font-bold font-headline">{formatCurrency(account.debt)}</p>
                  <Progress value={usagePercentage} className="h-2 mt-2" style={{ '--progress-color': progressColor } as React.CSSProperties} />
-                <p className="text-xs text-muted-foreground mt-1">Límite: {formatCurrency(account.creditLimit)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Límite: {formatCurrency(account.credit_limit)}</p>
             </div>
         </CardContent>
         <div className="p-2 flex justify-end items-center text-muted-foreground">
@@ -103,6 +104,7 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
+    const { toast } = useToast();
 
     const { groupedAccounts, totalPatrimony } = useMemo(() => {
         const grouped = data.reduce((acc, account) => {
@@ -125,11 +127,23 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
         setIsAlertOpen(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (accountToDelete) {
-            deleteAccount(accountToDelete);
-            onAccountChange();
-            setAccountToDelete(null);
+            try {
+                await deleteAccount(accountToDelete);
+                onAccountChange();
+                setAccountToDelete(null);
+                toast({
+                    title: "Cuenta eliminada",
+                    description: "La cuenta ha sido eliminada exitosamente."
+                })
+            } catch (error) {
+                 toast({
+                    variant: 'destructive',
+                    title: "Error al eliminar",
+                    description: "No se pudo eliminar la cuenta."
+                })
+            }
         }
         setIsAlertOpen(false);
     };

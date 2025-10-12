@@ -13,9 +13,9 @@ export async function GET(request: NextRequest) {
       [user_id]
     );
     return NextResponse.json(rows);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al obtener cuentas", details: error },
+      { error: "Error al obtener cuentas", details: error.message },
       { status: 500 }
     );
   }
@@ -50,9 +50,9 @@ export async function POST(request: NextRequest) {
       ]
     );
     return NextResponse.json({ message: "Cuenta creada" }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al crear cuenta", details: error },
+      { error: "Error al crear cuenta", details: error.message },
       { status: 500 }
     );
   }
@@ -83,9 +83,9 @@ export async function PUT(request: NextRequest) {
       ]
     );
     return NextResponse.json({ message: "Cuenta actualizada" });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al actualizar cuenta", details: error },
+      { error: "Error al actualizar cuenta", details: error.message },
       { status: 500 }
     );
   }
@@ -97,9 +97,9 @@ export async function DELETE(request: NextRequest) {
     const { id } = await request.json();
     await pool.query("DELETE FROM accounts WHERE id = ?", [id]);
     return NextResponse.json({ message: "Cuenta eliminada" });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al eliminar cuenta", details: error },
+      { error: "Error al eliminar cuenta", details: error.message },
       { status: 500 }
     );
   }

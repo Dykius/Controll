@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { addBudget, updateBudget, getCategories, getBudgets } from '@/lib/data-service';
-import type { Budget } from '@/lib/types';
+import type { Budget, Category } from '@/lib/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -29,6 +29,8 @@ import { Calendar } from '@/components/ui/calendar';
 interface BudgetFormProps {
     onSuccess: () => void;
     budget?: Budget | null;
+    categories: Category[];
+    allBudgets: Budget[];
 }
 
 const formSchema = z.object({
@@ -37,10 +39,9 @@ const formSchema = z.object({
   month: z.date({ required_error: 'Debes seleccionar un mes.' }),
 });
 
-export function BudgetForm({ onSuccess, budget }: BudgetFormProps) {
+export function BudgetForm({ onSuccess, budget, categories, allBudgets }: BudgetFormProps) {
   const { toast } = useToast();
-  const categories = getCategories().filter(c => c.type === 'Expense');
-  const allBudgets = getBudgets();
+  const expenseCategories = categories.filter(c => c.type === 'Expense');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,8 +68,9 @@ export function BudgetForm({ onSuccess, budget }: BudgetFormProps) {
     }
   }, [budget, form]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const monthString = `${values.month.getFullYear()}-${(values.month.getMonth() + 1).toString().padStart(2, '0')}`;
+    const user_id = 1; // En app real, obtener de la sesión
 
     // Check if a budget for this category and month already exists (if not editing)
     if (!budget && allBudgets.some(b => b.categoryId === values.categoryId && b.month === monthString)) {
@@ -82,10 +84,10 @@ export function BudgetForm({ onSuccess, budget }: BudgetFormProps) {
 
     try {
       if (budget) {
-        updateBudget({ ...budget, ...values, month: monthString });
+        await updateBudget({ ...budget, ...values, month: monthString, user_id });
         toast({ title: '¡Presupuesto actualizado!', description: 'Tu presupuesto ha sido modificado.' });
       } else {
-        addBudget({ ...values, month: monthString });
+        await addBudget({ ...values, month: monthString, user_id });
         toast({ title: '¡Presupuesto agregado!', description: 'Tu nuevo presupuesto ha sido registrado.' });
       }
       onSuccess();
@@ -114,7 +116,7 @@ export function BudgetForm({ onSuccess, budget }: BudgetFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {categories.map(category => (
+                  {expenseCategories.map(category => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
                     </SelectItem>

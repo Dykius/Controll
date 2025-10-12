@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getBudgets, getCategories, getTransactions, deleteBudget } from "@/lib/data-service";
@@ -24,6 +24,7 @@ import { BudgetForm } from "./budget-form";
 import MonthSelector from "./month-selector";
 import type { Budget, Category, Transaction } from "@/lib/types";
 import { addMonths } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 
 const iconMap: { [key: string]: React.ReactNode } = {
@@ -44,21 +45,36 @@ export default function BudgetsPage() {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-  // States for data
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const refreshData = () => {
-    setBudgets(getBudgets());
-    setCategories(getCategories());
-    setTransactions(getTransactions());
-  };
+  const refreshData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const user_id = 1; // En app real, obtener de la sesión
+      const [budgetsData, categoriesData, transactionsData] = await Promise.all([
+        getBudgets(user_id),
+        getCategories(),
+        getTransactions(user_id)
+      ]);
+      setBudgets(budgetsData);
+      setCategories(categoriesData);
+      setTransactions(transactionsData);
+    } catch (error) {
+      console.error("Failed to refresh data:", error);
+      toast({ variant: 'destructive', title: 'Error', description: 'No se pudieron cargar los datos.' });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     refreshData();
-  }, []);
+  }, [refreshData]);
 
   const { monthlyBudgetsData, totalBudgeted, totalSpent } = useMemo(() => {
     const monthStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -101,11 +117,16 @@ export default function BudgetsPage() {
     setIsAlertOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (budgetToDelete) {
-      deleteBudget(budgetToDelete);
-      setBudgetToDelete(null);
-      refreshData();
+      try {
+        await deleteBudget(budgetToDelete);
+        setBudgetToDelete(null);
+        refreshData();
+        toast({ title: 'Presupuesto eliminado' });
+      } catch (error) {
+        toast({ variant: 'destructive', title: 'Error', description: 'No se pudo eliminar el presupuesto.' });
+      }
     }
     setIsAlertOpen(false);
   };
@@ -117,7 +138,11 @@ export default function BudgetsPage() {
   }
 
   const maxDate = addMonths(new Date(), 3);
-  const minDate = new Date(2020, 0, 1); // Example min date
+  const minDate = new Date(2020, 0, 1);
+
+  if (isLoading) {
+    return <div>Cargando presupuestos...</div>
+  }
 
   return (
     <div className="space-y-6">
@@ -139,7 +164,7 @@ export default function BudgetsPage() {
                     <DialogHeader>
                         <DialogTitle className="font-headline">{editingBudget ? "Editar" : "Nuevo"} Presupuesto</DialogTitle>
                     </DialogHeader>
-                    <BudgetForm onSuccess={handleSuccess} budget={editingBudget} />
+                    <BudgetForm onSuccess={handleSuccess} budget={editingBudget} categories={categories} allBudgets={budgets} />
                 </DialogContent>
             </Dialog>
         </div>
