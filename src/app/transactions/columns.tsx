@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { MoreHorizontal, Pencil, Trash2, ArrowDownUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import React from "react"
+import { Badge } from "@/components/ui/badge"
 
 type ActionCellProps = {
     row: any;
@@ -60,12 +61,15 @@ export const getColumns = (
         const account = accounts.find(a => a.id === row.original.accountId);
         return (
              <div className="flex items-center gap-3">
-                 <div className="bg-secondary p-2 rounded-full h-8 w-8 flex items-center justify-center">
-                    <span className="font-bold text-xs">{category?.name.charAt(0) || '?'}</span>
+                 <div className="bg-secondary p-2 rounded-full h-10 w-10 flex items-center justify-center">
+                    <span className="font-bold text-sm">{category?.name.charAt(0) || '?'}</span>
                  </div>
                  <div>
                     <div className="font-medium">{row.getValue("description")}</div>
-                    <div className="text-sm text-muted-foreground">{account?.name}</div>
+                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                        <span>{account?.name}</span>
+                        {category && <Badge variant="outline" className="rounded-full hidden sm:inline-flex">{category.name}</Badge>}
+                    </div>
                  </div>
             </div>
         )

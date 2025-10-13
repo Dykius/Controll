@@ -75,8 +75,8 @@ export async function getAccounts(user_id: number): Promise<Account[]> {
   // Calcular balance dinámico
   return accountsFromDB.map(acc => {
     // Asegurarse que los valores iniciales son numéricos
-    const initialBalance = Number(acc.initial_balance) || 0;
-    const initialDebt = Number(acc.initial_debt) || 0;
+    const initial_balance = Number(acc.initial_balance) || 0;
+    const initial_debt = Number(acc.initial_debt) || 0;
 
     if (acc.type !== 'Credit Card') {
       const balance = transactions.reduce((sum, t) => {
@@ -85,8 +85,8 @@ export async function getAccounts(user_id: number): Promise<Account[]> {
           if (t.type === 'Expense') return sum - Number(t.amount);
         }
         return sum;
-      }, initialBalance);
-      return { ...acc, balance };
+      }, initial_balance);
+      return { ...acc, balance: balance, initial_balance: initial_balance };
     } else {
       const debt = transactions.reduce((sum, t) => {
         if (t.accountId === acc.id) {
@@ -95,8 +95,8 @@ export async function getAccounts(user_id: number): Promise<Account[]> {
           if (t.type === 'Income') return sum - Number(t.amount);
         }
         return sum;
-      }, initialDebt);
-      return { ...acc, debt };
+      }, initial_debt);
+      return { ...acc, debt: debt, credit_limit: Number(acc.credit_limit), initial_debt: initial_debt };
     }
   });
 }
@@ -239,6 +239,7 @@ export async function deleteBudget(id: string) {
 
 // Dashboard data desde la API
 export async function getDashboardData(user_id: number) {
+  // Las llamadas ahora se hacen en paralelo para mejorar el rendimiento
   const [accounts, transactions, categories] = await Promise.all([
     getAccounts(user_id),
     getTransactions(user_id),
@@ -252,7 +253,7 @@ export async function getDashboardData(user_id: number) {
   const totalExpense = transactions
     .filter((t: any) => t.type === "Expense")
     .reduce((sum: number, t: any) => sum + Number(t.amount), 0);
-
+  
   const balance = accounts
     .filter((acc): acc is DebitAccount => acc.type !== "Credit Card")
     .reduce((sum, acc) => sum + acc.balance, 0);

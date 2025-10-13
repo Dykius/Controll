@@ -7,7 +7,7 @@ import { TrendChart } from "@/components/dashboard/trend-chart";
 import { ExpensesChart } from "@/components/dashboard/expenses-chart";
 import { formatCurrency } from "@/lib/utils";
 import { getDashboardData } from "@/lib/data-service";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { Account, Category, Transaction } from "@/lib/types";
 
 type DashboardData = {
@@ -24,23 +24,23 @@ export default function DashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                // En una app real, el user_id vendría de la sesión
-                const user_id = 1;
-                const dashboardData = await getDashboardData(user_id);
-                setData(dashboardData);
-            } catch (error) {
-                console.error("Failed to fetch dashboard data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
+    const fetchData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            // En una app real, el user_id vendría de la sesión
+            const user_id = 1;
+            const dashboardData = await getDashboardData(user_id);
+            setData(dashboardData);
+        } catch (error) {
+            console.error("Failed to fetch dashboard data:", error);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     if (isLoading || !data) {
         return <div>Cargando...</div>;

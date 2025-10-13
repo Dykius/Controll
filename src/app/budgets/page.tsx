@@ -85,22 +85,22 @@ export default function BudgetsPage() {
       const category = categories.find(c => c.id === budget.categoryId);
       const spent = transactions
         .filter(t => t.categoryId === budget.categoryId && t.type === 'Expense' && new Date(t.date).toISOString().startsWith(monthStr))
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((sum, t) => sum + Number(t.amount), 0);
       
-      const progress = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : 0;
+      const progress = budget.amount > 0 ? Math.min((spent / Number(budget.amount)) * 100, 100) : 0;
       
       return {
         ...budget,
         categoryName: category?.name || 'Sin categoría',
         categoryIcon: category?.icon || 'Default',
         spent,
-        remaining: budget.amount - spent,
+        remaining: Number(budget.amount) - spent,
         progress,
         color: getBudgetStatusColor(progress),
       };
     });
 
-    const totalBudgeted = data.reduce((sum, b) => sum + b.amount, 0);
+    const totalBudgeted = data.reduce((sum, b) => sum + Number(b.amount), 0);
     const totalSpent = data.reduce((sum, b) => sum + b.spent, 0);
 
     return { monthlyBudgetsData: data, totalBudgeted, totalSpent };
@@ -233,7 +233,7 @@ export default function BudgetsPage() {
                     <CardContent className="space-y-3 flex-1 flex flex-col justify-end">
                         <div>
                              <p className="text-sm text-muted-foreground">
-                                {formatCurrency(budget.spent)} de {formatCurrency(budget.amount)}
+                                {formatCurrency(budget.spent)} de {formatCurrency(Number(budget.amount))}
                             </p>
                             <Progress value={budget.progress} className="h-3 mt-1" style={{ '--progress-color': budget.color } as React.CSSProperties} />
                         </div>
