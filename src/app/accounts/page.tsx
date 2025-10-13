@@ -15,7 +15,8 @@ export default function AccountsPage() {
     if (!user) return;
     setIsLoading(true);
     try {
-      const accountsData = await getAccounts(user.userId);
+      // Ya no es necesario pasar el user.userId
+      const accountsData = await getAccounts();
       setData(accountsData);
     } catch (error) {
       console.error("Failed to fetch accounts:", error);
@@ -28,7 +29,11 @@ export default function AccountsPage() {
     if (user) {
       refreshAccounts();
     }
-  }, [user, refreshAccounts]);
+     if (!isAuthLoading && !user) {
+      setIsLoading(false);
+      setData([]);
+    }
+  }, [user, isAuthLoading, refreshAccounts]);
   
   if (isLoading || isAuthLoading) {
     return <div>Cargando cuentas...</div>;

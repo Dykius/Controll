@@ -9,9 +9,9 @@ import type {
 
 // --- Transacciones ---
 
-// Obtener transacciones
-export async function getTransactions(user_id: number): Promise<Transaction[]> {
-  const response = await fetch(`/api/transactions?user_id=${user_id}`);
+// Obtener transacciones del usuario autenticado
+export async function getTransactions(): Promise<Transaction[]> {
+  const response = await fetch(`/api/transactions`);
   if (!response.ok) {
     throw new Error("Error al obtener transacciones");
   }
@@ -19,7 +19,7 @@ export async function getTransactions(user_id: number): Promise<Transaction[]> {
 }
 
 // Crear transacción
-export async function addTransaction(transaction: Omit<Transaction, 'id'> & { user_id: number }) {
+export async function addTransaction(transaction: Omit<Transaction, 'id' | 'user_id'>) {
   const newId = `txn-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   const transactionToAdd = { ...transaction, id: newId };
   
@@ -63,14 +63,15 @@ export async function deleteTransaction(id: string) {
 
 // --- Cuentas ---
 
-// Obtener cuentas de un usuario
-export async function getAccounts(user_id: number): Promise<Account[]> {
-  const response = await fetch(`/api/accounts?user_id=${user_id}`);
+// Obtener cuentas del usuario autenticado
+export async function getAccounts(): Promise<Account[]> {
+  const response = await fetch(`/api/accounts`);
   if (!response.ok) {
     throw new Error("Error al obtener cuentas");
   }
   const accountsFromDB: any[] = await response.json();
-  const transactions = await getTransactions(user_id);
+  // Se obtienen las transacciones del usuario autenticado
+  const transactions = await getTransactions();
 
   // Calcular balance dinámico
   return accountsFromDB.map(acc => {
@@ -102,7 +103,7 @@ export async function getAccounts(user_id: number): Promise<Account[]> {
 }
 
 // Crear cuenta
-export async function addAccount(accountData: Omit<Account, 'id' | 'balance' | 'debt'> & { user_id: number }) {
+export async function addAccount(accountData: Omit<Account, 'id' | 'balance' | 'debt' | 'user_id'>) {
   const newId = `acc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   const accountToAdd = { ...accountData, id: newId };
   
@@ -182,9 +183,9 @@ export async function getCategories(): Promise<Category[]> {
 
 // --- Presupuestos ---
 
-// Obtener presupuestos de un usuario
-export async function getBudgets(user_id: number): Promise<Budget[]> {
-  const response = await fetch(`/api/budgets?user_id=${user_id}`);
+// Obtener presupuestos del usuario autenticado
+export async function getBudgets(): Promise<Budget[]> {
+  const response = await fetch(`/api/budgets`);
   if (!response.ok) {
     throw new Error("Error al obtener presupuestos");
   }
@@ -192,7 +193,7 @@ export async function getBudgets(user_id: number): Promise<Budget[]> {
 }
 
 // Crear presupuesto
-export async function addBudget(budgetData: { categoryId: string; amount: number; month: string; user_id: number; }) {
+export async function addBudget(budgetData: { categoryId: string; amount: number; month: string; }) {
   const newId = `bud-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   const budgetToAdd = { ...budgetData, id: newId };
   
@@ -238,11 +239,12 @@ export async function deleteBudget(id: string) {
 // --- Dashboard ---
 
 // Dashboard data desde la API
-export async function getDashboardData(user_id: number) {
+export async function getDashboardData() {
   // Las llamadas ahora se hacen en paralelo para mejorar el rendimiento
+  // y se obtienen los datos del usuario autenticado
   const [accounts, transactions, categories] = await Promise.all([
-    getAccounts(user_id),
-    getTransactions(user_id),
+    getAccounts(),
+    getTransactions(),
     getCategories(),
   ]);
 

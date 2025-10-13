@@ -58,9 +58,9 @@ export default function BudgetsPage() {
     setIsLoading(true);
     try {
       const [budgetsData, categoriesData, transactionsData] = await Promise.all([
-        getBudgets(user.userId),
+        getBudgets(),
         getCategories(),
-        getTransactions(user.userId)
+        getTransactions()
       ]);
       setBudgets(budgetsData);
       setCategories(categoriesData);
@@ -77,7 +77,12 @@ export default function BudgetsPage() {
     if (user) {
       refreshData();
     }
-  }, [user, refreshData]);
+    if (!isAuthLoading && !user) {
+        setIsLoading(false);
+        setBudgets([]);
+        setTransactions([]);
+    }
+  }, [user, isAuthLoading, refreshData]);
 
   const { monthlyBudgetsData, totalBudgeted, totalSpent } = useMemo(() => {
     const monthStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;

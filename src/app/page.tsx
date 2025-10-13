@@ -26,10 +26,11 @@ export default function DashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchData = useCallback(async (userId: number) => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const dashboardData = await getDashboardData(userId);
+            // Ya no es necesario pasar el user.userId
+            const dashboardData = await getDashboardData();
             setData(dashboardData);
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
@@ -40,12 +41,21 @@ export default function DashboardPage() {
 
     useEffect(() => {
         if(user){
-            fetchData(user.userId);
+            fetchData();
         }
-    }, [user, fetchData]);
+        if (!isAuthLoading && !user) {
+            setIsLoading(false);
+            setData(null);
+        }
+    }, [user, isAuthLoading, fetchData]);
 
-    if (isLoading || isAuthLoading || !data) {
+    if (isLoading || isAuthLoading) {
         return <div>Cargando...</div>;
+    }
+
+    if (!data) {
+        // Podríamos mostrar un estado de bienvenida para nuevos usuarios
+        return <div>Bienvenido a Control+. Crea tu primera cuenta para empezar.</div>
     }
 
     const { totalIncome, totalExpense, balance, transactions, categories, accounts } = data;

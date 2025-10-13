@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { getSession } from "@/lib/session";
 
 // Obtener todas las cuentas de un usuario
 export async function GET(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
-    const { searchParams } = new URL(request.url);
-    const user_id = searchParams.get("user_id");
-    if (!user_id)
-      return NextResponse.json({ error: "user_id requerido" }, { status: 400 });
     const [rows] = await pool.query(
       "SELECT * FROM accounts WHERE user_id = ?",
       [user_id]
@@ -23,10 +26,15 @@ export async function GET(request: NextRequest) {
 
 // Crear una cuenta
 export async function POST(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
     const {
       id,
-      user_id,
       name,
       type,
       currency,
@@ -60,6 +68,12 @@ export async function POST(request: NextRequest) {
 
 // Actualizar una cuenta
 export async function PUT(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
     const {
       id,
@@ -70,8 +84,10 @@ export async function PUT(request: NextRequest) {
       closing_date,
       initial_debt,
     } = await request.json();
+
+    // TO-DO: Verify that the account belongs to the user
     await pool.query(
-      "UPDATE accounts SET name = ?, currency = ?, initial_balance = ?, credit_limit = ?, closing_date = ?, initial_debt = ? WHERE id = ?",
+      "UPDATE accounts SET name = ?, currency = ?, initial_balance = ?, credit_limit = ?, closing_date = ?, initial_debt = ? WHERE id = ? AND user_id = ?",
       [
         name,
         currency,
@@ -80,6 +96,7 @@ export async function PUT(request: NextRequest) {
         closing_date,
         initial_debt,
         id,
+        user_id,
       ]
     );
     return NextResponse.json({ message: "Cuenta actualizada" });
@@ -93,9 +110,16 @@ export async function PUT(request: NextRequest) {
 
 // Eliminar una cuenta
 export async function DELETE(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
     const { id } = await request.json();
-    await pool.query("DELETE FROM accounts WHERE id = ?", [id]);
+    // Verify that the account belongs to the user before deleting
+    await pool.query("DELETE FROM accounts WHERE id = ? AND user_id = ?", [id, user_id]);
     return NextResponse.json({ message: "Cuenta eliminada" });
   } catch (error: any) {
     return NextResponse.json(

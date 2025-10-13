@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { getSession } from "@/lib/session";
 
 // Obtener presupuestos de un usuario
 export async function GET(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
-    const { searchParams } = new URL(request.url);
-    const user_id = searchParams.get("user_id");
-    if (!user_id)
-      return NextResponse.json({ error: "user_id requerido" }, { status: 400 });
     const [rows] = await pool.query("SELECT * FROM budgets WHERE user_id = ?", [
       user_id,
     ]);
@@ -22,8 +25,14 @@ export async function GET(request: NextRequest) {
 
 // Crear presupuesto
 export async function POST(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
-    const { id, categoryId, user_id, amount, month } = await request.json();
+    const { id, categoryId, amount, month } = await request.json();
     await pool.query(
       "INSERT INTO budgets (id, category_id, user_id, amount, month) VALUES (?, ?, ?, ?, ?)",
       [id, categoryId, user_id, amount, month]
@@ -42,11 +51,17 @@ export async function POST(request: NextRequest) {
 
 // Actualizar presupuesto
 export async function PUT(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
-    const { id, categoryId, user_id, amount, month } = await request.json();
+    const { id, categoryId, amount, month } = await request.json();
     await pool.query(
-      "UPDATE budgets SET category_id = ?, user_id = ?, amount = ?, month = ? WHERE id = ?",
-      [categoryId, user_id, amount, month, id]
+      "UPDATE budgets SET category_id = ?, amount = ?, month = ? WHERE id = ? AND user_id = ?",
+      [categoryId, amount, month, id, user_id]
     );
     return NextResponse.json({ message: "Presupuesto actualizado" });
   } catch (error: any) {
@@ -59,9 +74,15 @@ export async function PUT(request: NextRequest) {
 
 // Eliminar presupuesto
 export async function DELETE(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  const user_id = session.userId;
+
   try {
     const { id } = await request.json();
-    await pool.query("DELETE FROM budgets WHERE id = ?", [id]);
+    await pool.query("DELETE FROM budgets WHERE id = ? AND user_id = ?", [id, user_id]);
     return NextResponse.json({ message: "Presupuesto eliminado" });
   } catch (error: any) {
     return NextResponse.json(

@@ -18,9 +18,10 @@ export default function TransactionsPage() {
     if (!user) return;
     setIsLoading(true);
     try {
+      // Ya no es necesario pasar el user.userId
       const [transactionsData, accountsData, categoriesData] = await Promise.all([
-        getTransactions(user.userId),
-        getAccounts(user.userId),
+        getTransactions(),
+        getAccounts(),
         getCategories()
       ]);
       setTransactions(transactionsData);
@@ -37,7 +38,12 @@ export default function TransactionsPage() {
     if (user) {
       refreshData();
     }
-  }, [user, refreshData]);
+    if (!isAuthLoading && !user) {
+        setIsLoading(false);
+        setTransactions([]);
+        setAccounts([]);
+    }
+  }, [user, isAuthLoading, refreshData]);
   
   if (isLoading || isAuthLoading) {
     return <div>Cargando transacciones...</div>;
