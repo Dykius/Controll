@@ -27,13 +27,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const data = await request.json();
-        const { id, account_id, category_id, user_id, date, description, amount, type } = data;
+        const { id, accountId, categoryId, user_id, date, description, amount, type } = data;
         
-        // TODO: En una app real, deberíamos validar que la cuenta y categoría pertenecen al usuario.
-
         await pool.query(
             'INSERT INTO transactions (id, account_id, category_id, user_id, date, description, amount, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [id, account_id, category_id, user_id, date, description, amount, type]
+            [id, accountId, categoryId, user_id, date, description, amount, type]
         );
         return NextResponse.json({ message: 'Transacción creada' }, { status: 201 });
     } catch (error: any) {
@@ -45,10 +43,10 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const data = await request.json();
-        const { id, account_id, category_id, user_id, date, description, amount, type } = data;
+        const { id, accountId, categoryId, user_id, date, description, amount, type } = data;
         await pool.query(
             'UPDATE transactions SET account_id = ?, category_id = ?, user_id = ?, date = ?, description = ?, amount = ?, type = ? WHERE id = ?',
-            [account_id, category_id, user_id, date, description, amount, type, id]
+            [accountId, categoryId, user_id, date, description, amount, type, id]
         );
         return NextResponse.json({ message: 'Transacción actualizada' });
     } catch (error: any) {

@@ -23,10 +23,10 @@ export async function GET(request: NextRequest) {
 // Crear presupuesto
 export async function POST(request: NextRequest) {
   try {
-    const { id, category_id, user_id, amount, month } = await request.json();
+    const { id, categoryId, user_id, amount, month } = await request.json();
     await pool.query(
       "INSERT INTO budgets (id, category_id, user_id, amount, month) VALUES (?, ?, ?, ?, ?)",
-      [id, category_id, user_id, amount, month]
+      [id, categoryId, user_id, amount, month]
     );
     return NextResponse.json(
       { message: "Presupuesto creado" },
@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
 // Actualizar presupuesto
 export async function PUT(request: NextRequest) {
   try {
-    const { id, category_id, user_id, amount, month } = await request.json();
+    const { id, categoryId, user_id, amount, month } = await request.json();
     await pool.query(
       "UPDATE budgets SET category_id = ?, user_id = ?, amount = ?, month = ? WHERE id = ?",
-      [category_id, user_id, amount, month, id]
+      [categoryId, user_id, amount, month, id]
     );
     return NextResponse.json({ message: "Presupuesto actualizado" });
   } catch (error: any) {

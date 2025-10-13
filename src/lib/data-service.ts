@@ -74,24 +74,28 @@ export async function getAccounts(user_id: number): Promise<Account[]> {
 
   // Calcular balance dinámico
   return accountsFromDB.map(acc => {
+    // Asegurarse que los valores iniciales son numéricos
+    const initialBalance = Number(acc.initial_balance) || 0;
+    const initialDebt = Number(acc.initial_debt) || 0;
+
     if (acc.type !== 'Credit Card') {
       const balance = transactions.reduce((sum, t) => {
         if (t.accountId === acc.id) {
-          if (t.type === 'Income') return sum + t.amount;
-          if (t.type === 'Expense') return sum - t.amount;
+          if (t.type === 'Income') return sum + Number(t.amount);
+          if (t.type === 'Expense') return sum - Number(t.amount);
         }
         return sum;
-      }, acc.initial_balance);
+      }, initialBalance);
       return { ...acc, balance };
     } else {
       const debt = transactions.reduce((sum, t) => {
         if (t.accountId === acc.id) {
           // Para TC, los gastos suman a la deuda, los pagos (ingresos a la TC) restan.
-          if (t.type === 'Expense') return sum + t.amount;
-          if (t.type === 'Income') return sum - t.amount;
+          if (t.type === 'Expense') return sum + Number(t.amount);
+          if (t.type === 'Income') return sum - Number(t.amount);
         }
         return sum;
-      }, acc.initial_debt);
+      }, initialDebt);
       return { ...acc, debt };
     }
   });
@@ -108,7 +112,8 @@ export async function addAccount(accountData: Omit<Account, 'id' | 'balance' | '
     body: JSON.stringify(accountToAdd),
   });
   if (!response.ok) {
-    throw new Error("Error al crear cuenta");
+    const errorBody = await response.json();
+    throw new Error(errorBody.details || "Error al crear cuenta");
   }
   return await response.json();
 }
@@ -197,7 +202,8 @@ export async function addBudget(budgetData: { categoryId: string; amount: number
     body: JSON.stringify(budgetToAdd),
   });
   if (!response.ok) {
-    throw new Error("Error al crear presupuesto");
+    const errorBody = await response.json();
+    throw new Error(errorBody.details || "Error al crear presupuesto");
   }
   return await response.json();
 }
@@ -210,7 +216,8 @@ export async function updateBudget(budget: Budget) {
         body: JSON.stringify(budget),
     });
     if (!response.ok) {
-        throw new Error("Error al actualizar presupuesto");
+        const errorBody = await response.json();
+        throw new Error(errorBody.details || "Error al actualizar presupuesto");
     }
     return await response.json();
 }
