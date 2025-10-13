@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { addAccount } from '@/lib/data-service';
+import { useAuth } from '@/hooks/use-auth';
 
 interface AccountFormProps {
     onSuccess: () => void;
@@ -65,6 +66,7 @@ const formSchema = z.object({
 
 export function AccountForm({ onSuccess }: AccountFormProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -80,14 +82,20 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
   const accountType = form.watch('type');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+        toast({
+            variant: 'destructive',
+            title: 'Error de autenticación',
+            description: 'No se ha podido identificar al usuario.',
+        });
+        return;
+    }
+    
     try {
-        // En una app real, el user_id vendría de la sesión
-        const user_id = 1;
-
         const dataToAdd: any = {
             name: values.name,
             type: values.type,
-            user_id: user_id,
+            user_id: user.id,
             currency: 'COP',
         };
 

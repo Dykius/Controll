@@ -25,7 +25,7 @@ import MonthSelector from "./month-selector";
 import type { Budget, Category, Transaction } from "@/lib/types";
 import { addMonths } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-
+import { useAuth } from "@/hooks/use-auth";
 
 const iconMap: { [key: string]: React.ReactNode } = {
     Briefcase: <Building className="h-6 w-6" />,
@@ -40,6 +40,7 @@ const iconMap: { [key: string]: React.ReactNode } = {
 };
 
 export default function BudgetsPage() {
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -53,13 +54,13 @@ export default function BudgetsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const refreshData = useCallback(async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
-      const user_id = 1; // En app real, obtener de la sesión
       const [budgetsData, categoriesData, transactionsData] = await Promise.all([
-        getBudgets(user_id),
+        getBudgets(user.id),
         getCategories(),
-        getTransactions(user_id)
+        getTransactions(user.id)
       ]);
       setBudgets(budgetsData);
       setCategories(categoriesData);
@@ -70,11 +71,13 @@ export default function BudgetsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [user, toast]);
 
   useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+    if (user) {
+      refreshData();
+    }
+  }, [user, refreshData]);
 
   const { monthlyBudgetsData, totalBudgeted, totalSpent } = useMemo(() => {
     const monthStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -140,7 +143,7 @@ export default function BudgetsPage() {
   const maxDate = addMonths(new Date(), 3);
   const minDate = new Date(2020, 0, 1);
 
-  if (isLoading) {
+  if (isLoading || isAuthLoading) {
     return <div>Cargando presupuestos...</div>
   }
 

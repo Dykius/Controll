@@ -50,7 +50,9 @@ export function SignInForm() {
             throw new Error(data.error || 'Credenciales inválidas.');
         }
 
-        // Si la autenticación es exitosa, el servidor habrá establecido la cookie de sesión.
+        // Guardar la información del usuario en localStorage
+        localStorage.setItem('user', JSON.stringify(data.user));
+
         toast({
             title: 'Inicio de sesión exitoso',
             description: `¡Bienvenido de nuevo, ${data.user.fullName}!`,

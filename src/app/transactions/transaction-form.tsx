@@ -26,6 +26,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { Account, Category, Transaction } from '@/lib/types';
 import { addTransaction, updateTransaction } from '@/lib/data-service';
+import { useAuth } from '@/hooks/use-auth';
 
 interface TransactionFormProps {
     accounts: Account[];
@@ -45,6 +46,7 @@ const formSchema = z.object({
 
 export function TransactionForm({ accounts, categories, onSuccess, transaction }: TransactionFormProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const isEditMode = !!transaction;
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -88,14 +90,19 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+        toast({ variant: 'destructive', title: 'Error de autenticación' });
+        return;
+    }
+    
     try {
-        const user_id = 1; // En app real, obtener de la sesión
         const dateISO = values.date.toISOString();
 
         if (isEditMode && transaction) {
             await updateTransaction({
                 ...transaction,
                 ...values,
+                user_id: user.id,
                 date: dateISO,
             });
             toast({
@@ -105,7 +112,7 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
         } else {
              await addTransaction({
                 ...values,
-                user_id,
+                user_id: user.id,
                 date: dateISO,
             });
             toast({
@@ -220,7 +227,7 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
                     <FormControl>
                     <SelectTrigger>
                         <SelectValue placeholder="Selecciona una categoría" />
-                    </SelectTrigger>
+                    </Trigger>
                     </FormControl>
                     <SelectContent>
                     {filteredCategories.map(category => (

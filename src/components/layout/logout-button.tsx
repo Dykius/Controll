@@ -1,3 +1,4 @@
+
 "use client";
 
 import { LogOut } from "lucide-react";
@@ -8,10 +9,8 @@ export function LogoutButton() {
     const router = useRouter();
 
     const handleLogout = () => {
-        // Clear client-side session
-        localStorage.removeItem('session');
-        // Clear the session cookie for the middleware
-        document.cookie = 'session=; path=/; max-age=0;';
+        // Clear client-side session data
+        localStorage.removeItem('user');
         
         // Redirect to sign-in page and refresh the application state
         router.push('/auth/sign-in');

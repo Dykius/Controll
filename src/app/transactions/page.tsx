@@ -5,21 +5,22 @@ import { getTransactions, getAccounts, getCategories } from "@/lib/data-service"
 import { TransactionsClient } from "./transactions-client";
 import { useEffect, useState, useCallback } from "react";
 import type { Transaction, Account, Category } from "@/lib/types";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function TransactionsPage() {
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshData = useCallback(async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
-      // En una app real, el user_id vendría de la sesión
-      const user_id = 1;
       const [transactionsData, accountsData, categoriesData] = await Promise.all([
-        getTransactions(user_id),
-        getAccounts(user_id),
+        getTransactions(user.id),
+        getAccounts(user.id),
         getCategories()
       ]);
       setTransactions(transactionsData);
@@ -30,13 +31,15 @@ export default function TransactionsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+    if (user) {
+      refreshData();
+    }
+  }, [user, refreshData]);
   
-  if (isLoading) {
+  if (isLoading || isAuthLoading) {
     return <div>Cargando transacciones...</div>;
   }
   

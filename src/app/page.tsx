@@ -9,6 +9,7 @@ import { formatCurrency } from "@/lib/utils";
 import { getDashboardData } from "@/lib/data-service";
 import { useState, useEffect, useCallback } from "react";
 import type { Account, Category, Transaction } from "@/lib/types";
+import { useAuth } from "@/hooks/use-auth";
 
 type DashboardData = {
     totalIncome: number;
@@ -21,15 +22,14 @@ type DashboardData = {
 
 
 export default function DashboardPage() {
+    const { user, isLoading: isAuthLoading } = useAuth();
     const [data, setData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchData = useCallback(async () => {
+    const fetchData = useCallback(async (userId: number) => {
         setIsLoading(true);
         try {
-            // En una app real, el user_id vendría de la sesión
-            const user_id = 1;
-            const dashboardData = await getDashboardData(user_id);
+            const dashboardData = await getDashboardData(userId);
             setData(dashboardData);
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
@@ -39,10 +39,12 @@ export default function DashboardPage() {
     }, []);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        if(user){
+            fetchData(user.id);
+        }
+    }, [user, fetchData]);
 
-    if (isLoading || !data) {
+    if (isLoading || isAuthLoading || !data) {
         return <div>Cargando...</div>;
     }
 

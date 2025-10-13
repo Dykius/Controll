@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { format, addMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar } from '@/components/ui/calendar';
+import { useAuth } from '@/hooks/use-auth';
 
 interface BudgetFormProps {
     onSuccess: () => void;
@@ -41,6 +42,7 @@ const formSchema = z.object({
 
 export function BudgetForm({ onSuccess, budget, categories, allBudgets }: BudgetFormProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const expenseCategories = categories.filter(c => c.type === 'Expense');
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -69,8 +71,12 @@ export function BudgetForm({ onSuccess, budget, categories, allBudgets }: Budget
   }, [budget, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+        toast({ variant: 'destructive', title: 'Error de autenticación' });
+        return;
+    }
+
     const monthString = `${values.month.getFullYear()}-${(values.month.getMonth() + 1).toString().padStart(2, '0')}`;
-    const user_id = 1; // En app real, obtener de la sesión
 
     // Check if a budget for this category and month already exists (if not editing)
     if (!budget && allBudgets.some(b => b.categoryId === values.categoryId && b.month === monthString)) {
@@ -84,10 +90,10 @@ export function BudgetForm({ onSuccess, budget, categories, allBudgets }: Budget
 
     try {
       if (budget) {
-        await updateBudget({ ...budget, ...values, month: monthString, user_id });
+        await updateBudget({ ...budget, ...values, month: monthString, user_id: user.id });
         toast({ title: '¡Presupuesto actualizado!', description: 'Tu presupuesto ha sido modificado.' });
       } else {
-        await addBudget({ ...values, month: monthString, user_id });
+        await addBudget({ ...values, month: monthString, user_id: user.id });
         toast({ title: '¡Presupuesto agregado!', description: 'Tu nuevo presupuesto ha sido registrado.' });
       }
       onSuccess();

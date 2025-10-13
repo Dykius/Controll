@@ -4,17 +4,18 @@ import { getAccounts } from "@/lib/data-service";
 import { AccountsClient } from "./accounts-client";
 import type { Account } from "@/lib/types";
 import { useEffect, useState, useCallback } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AccountsPage() {
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [data, setData] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshAccounts = useCallback(async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
-      // En una app real, el user_id vendría de la sesión
-      const user_id = 1;
-      const accountsData = await getAccounts(user_id);
+      const accountsData = await getAccounts(user.id);
       setData(accountsData);
     } catch (error) {
       console.error("Failed to fetch accounts:", error);
@@ -22,13 +23,15 @@ export default function AccountsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    refreshAccounts();
-  }, [refreshAccounts]);
+    if (user) {
+      refreshAccounts();
+    }
+  }, [user, refreshAccounts]);
   
-  if (isLoading) {
+  if (isLoading || isAuthLoading) {
     return <div>Cargando cuentas...</div>;
   }
 
