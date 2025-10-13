@@ -19,8 +19,8 @@ export default function TransactionsPage() {
     setIsLoading(true);
     try {
       const [transactionsData, accountsData, categoriesData] = await Promise.all([
-        getTransactions(user.id),
-        getAccounts(user.id),
+        getTransactions(user.userId),
+        getAccounts(user.userId),
         getCategories()
       ]);
       setTransactions(transactionsData);

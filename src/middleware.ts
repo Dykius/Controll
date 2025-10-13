@@ -1,45 +1,52 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
-export function middleware(request: NextRequest) {
-    // DEVELOPMENT ONLY: Temporarily disable auth to view inner pages
-    return NextResponse.next();
-    
-    /*
+const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET || 'your-super-secret-key-that-is-long');
+
+async function verifyToken(token: string) {
+    try {
+        await jwtVerify(token, SECRET_KEY);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    // In middleware, we can't access localStorage. We should rely on cookies for session management.
-    // The browser will automatically send cookies with each request.
+    
+    // Allow API routes, static files, and image optimization to pass through
+    if (pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('favicon.ico')) {
+        return NextResponse.next();
+    }
+    
     const sessionCookie = request.cookies.get('session');
-    const hasSession = !!sessionCookie;
+    const token = sessionCookie?.value;
+    const hasSession = token ? await verifyToken(token) : false;
 
     const isAuthPage = pathname.startsWith('/auth');
 
-    // If the user has a session and tries to access an auth page (like login or sign-up),
-    // redirect them to the dashboard.
     if (hasSession && isAuthPage) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 
-    // If the user does not have a session and is trying to access any page
-    // that is NOT an auth page, redirect them to the login page.
     if (!hasSession && !isAuthPage) {
         return NextResponse.redirect(new URL('/auth/sign-in', request.url));
     }
 
-    // Otherwise, allow the request to proceed.
     return NextResponse.next();
-    */
 }
 
 export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * But we want to protect api routes, so we check them inside the middleware
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }

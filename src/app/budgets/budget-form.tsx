@@ -17,14 +17,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addBudget, updateBudget, getCategories, getBudgets } from '@/lib/data-service';
+import { addBudget, updateBudget } from '@/lib/data-service';
 import type { Budget, Category } from '@/lib/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, addMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar } from '@/components/ui/calendar';
 import { useAuth } from '@/hooks/use-auth';
 
 interface BudgetFormProps {
@@ -78,7 +77,6 @@ export function BudgetForm({ onSuccess, budget, categories, allBudgets }: Budget
 
     const monthString = `${values.month.getFullYear()}-${(values.month.getMonth() + 1).toString().padStart(2, '0')}`;
 
-    // Check if a budget for this category and month already exists (if not editing)
     if (!budget && allBudgets.some(b => b.categoryId === values.categoryId && b.month === monthString)) {
         toast({
             variant: 'destructive',
@@ -89,11 +87,17 @@ export function BudgetForm({ onSuccess, budget, categories, allBudgets }: Budget
     }
 
     try {
+      const budgetData = {
+        ...values,
+        month: monthString,
+        user_id: user.userId
+      };
+
       if (budget) {
-        await updateBudget({ ...budget, ...values, month: monthString, user_id: user.id });
+        await updateBudget({ ...budget, ...budgetData });
         toast({ title: '¡Presupuesto actualizado!', description: 'Tu presupuesto ha sido modificado.' });
       } else {
-        await addBudget({ ...values, month: monthString, user_id: user.id });
+        await addBudget(budgetData);
         toast({ title: '¡Presupuesto agregado!', description: 'Tu nuevo presupuesto ha sido registrado.' });
       }
       onSuccess();

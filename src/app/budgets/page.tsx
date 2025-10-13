@@ -58,9 +58,9 @@ export default function BudgetsPage() {
     setIsLoading(true);
     try {
       const [budgetsData, categoriesData, transactionsData] = await Promise.all([
-        getBudgets(user.id),
+        getBudgets(user.userId),
         getCategories(),
-        getTransactions(user.id)
+        getTransactions(user.userId)
       ]);
       setBudgets(budgetsData);
       setCategories(categoriesData);

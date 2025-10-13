@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         if (user) {
-            fetchData(user.id);
+            fetchData(user.userId);
         }
     }, [user, fetchData]);
 

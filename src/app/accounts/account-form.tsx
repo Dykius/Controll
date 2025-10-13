@@ -95,17 +95,17 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
         const dataToAdd: any = {
             name: values.name,
             type: values.type,
-            user_id: user.id,
+            user_id: user.userId,
             currency: 'COP',
         };
 
         if (values.type === 'Credit Card') {
             dataToAdd.credit_limit = values.credit_limit;
             dataToAdd.closing_date = values.closing_date;
-            dataToAdd.initial_debt = values.initial_debt;
-            dataToAdd.initial_balance = 0; // No aplica para TC
+            dataToAdd.initial_debt = values.initial_debt || 0;
+            dataToAdd.initial_balance = 0;
         } else {
-            dataToAdd.initial_balance = values.initial_balance;
+            dataToAdd.initial_balance = values.initial_balance || 0;
             dataToAdd.credit_limit = 0;
             dataToAdd.closing_date = null;
             dataToAdd.initial_debt = 0;

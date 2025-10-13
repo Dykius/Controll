@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AppLayout } from '@/components/layout/app-layout';
+import { AuthProvider } from '@/hooks/use-auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,10 +25,12 @@ export default function RootLayout({
             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
         </head>
       <body className={`${inter.className} font-body antialiased bg-background text-foreground`}>
-            <AppLayout>
-                {children}
-            </AppLayout>
-            <Toaster />
+            <AuthProvider>
+                <AppLayout>
+                    {children}
+                </AppLayout>
+                <Toaster />
+            </AuthProvider>
       </body>
     </html>
   );

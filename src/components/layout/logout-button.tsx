@@ -4,17 +4,26 @@
 import { LogOut } from "lucide-react";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export function LogoutButton() {
     const router = useRouter();
+    const { toast } = useToast();
 
-    const handleLogout = () => {
-        // Clear client-side session data
-        localStorage.removeItem('user');
-        
-        // Redirect to sign-in page and refresh the application state
-        router.push('/auth/sign-in');
-        router.refresh();
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            // This will trigger a reload and the middleware will redirect to the login page.
+            toast({
+                title: "Sesión cerrada",
+                description: "Has cerrado sesión exitosamente.",
+            });
+            router.push('/auth/sign-in');
+            router.refresh();
+        }
     };
 
     return (

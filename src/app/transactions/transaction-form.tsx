@@ -97,24 +97,23 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
     
     try {
         const dateISO = values.date.toISOString();
+        const transactionData = {
+            ...values,
+            user_id: user.userId,
+            date: dateISO,
+        }
 
         if (isEditMode && transaction) {
             await updateTransaction({
                 ...transaction,
-                ...values,
-                user_id: user.id,
-                date: dateISO,
+                ...transactionData,
             });
             toast({
                 title: '¡Transacción actualizada!',
                 description: 'Tu transacción ha sido modificada.',
             });
         } else {
-             await addTransaction({
-                ...values,
-                user_id: user.id,
-                date: dateISO,
-            });
+             await addTransaction(transactionData);
             toast({
               title: '¡Transacción agregada!',
               description: 'Tu nueva transacción ha sido registrada.',

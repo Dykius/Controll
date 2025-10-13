@@ -15,11 +15,10 @@ export default function AccountsPage() {
     if (!user) return;
     setIsLoading(true);
     try {
-      const accountsData = await getAccounts(user.id);
+      const accountsData = await getAccounts(user.userId);
       setData(accountsData);
     } catch (error) {
       console.error("Failed to fetch accounts:", error);
-      // Opcional: mostrar un toast de error al usuario
     } finally {
       setIsLoading(false);
     }
