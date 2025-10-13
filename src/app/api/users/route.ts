@@ -7,16 +7,18 @@ export async function POST(request: NextRequest) {
   try {
     const { fullName, email, password } = await request.json();
     // Verificar si el usuario ya existe
-    const [users]: any = await pool.query(
+    const [users]: any[] = await pool.query(
       "SELECT id FROM users WHERE email = ?",
       [email]
     );
-    if (users && users.length > 0) {
+
+    if (users.length > 0) {
       return NextResponse.json(
-        { error: "El usuario ya existe" },
+        { error: "El correo electrónico ya está registrado." },
         { status: 409 }
       );
     }
+
     // Hashear contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result]: any = await pool.query(
@@ -27,9 +29,9 @@ export async function POST(request: NextRequest) {
       { message: "Usuario creado", userId: result.insertId },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al crear usuario", details: error },
+      { error: "Error al crear usuario", details: error.message },
       { status: 500 }
     );
   }
@@ -53,9 +55,9 @@ export async function GET(request: NextRequest) {
       );
     }
     return NextResponse.json(users[0]);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Error al obtener usuario", details: error },
+      { error: "Error al obtener usuario", details: error.message },
       { status: 500 }
     );
   }
