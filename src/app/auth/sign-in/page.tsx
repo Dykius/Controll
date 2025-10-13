@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { AuthCard } from '@/components/auth/auth-card';
-import { BackgroundPattern } from '@/components/auth/background-pattern';
-import { SignInForm } from './sign-in-form';
-import { GaugeCircle } from 'lucide-react';
+import Link from "next/link";
+import { AuthCard } from "@/components/auth/auth-card";
+import { BackgroundPattern } from "@/components/auth/background-pattern";
+import { SignInForm } from "./sign-in-form";
+import { GaugeCircle } from "lucide-react";
 
 export default function SignInPage() {
   return (
@@ -24,7 +24,7 @@ export default function SignInPage() {
           </div>
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-300">
-              ¿No tienes una cuenta?{' '}
+              ¿No tienes una cuenta?{" "}
               <Link
                 href="/auth/sign-up"
                 className="font-semibold text-nano-purple hover:text-white underline-offset-2 hover:underline"

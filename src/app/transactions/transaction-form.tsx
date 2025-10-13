@@ -1,10 +1,9 @@
-
 "use client";
 
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -12,39 +11,58 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import type { Account, Category, Transaction } from '@/lib/types';
-import { addTransaction, updateTransaction } from '@/lib/data-service';
-import { useAuth } from '@/hooks/use-auth';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import type { Account, Category, Transaction } from "@/lib/types";
+import { addTransaction, updateTransaction } from "@/lib/data-service";
+import { useAuth } from "@/hooks/use-auth";
 
 interface TransactionFormProps {
-    accounts: Account[];
-    categories: Category[];
-    onSuccess: () => void;
-    transaction?: Transaction | null;
+  accounts: Account[];
+  categories: Category[];
+  onSuccess: () => void;
+  transaction?: Transaction | null;
 }
 
 const formSchema = z.object({
-  description: z.string().min(2, { message: 'La descripción es muy corta.' }),
-  amount: z.coerce.number().positive({ message: 'El monto debe ser positivo.' }),
-  type: z.enum(['Income', 'Expense'], { required_error: 'Debes seleccionar un tipo.' }),
-  date: z.date({ required_error: 'Debes seleccionar una fecha.' }),
-  accountId: z.string({ required_error: 'Debes seleccionar una cuenta.' }),
-  categoryId: z.string({ required_error: 'Debes seleccionar una categoría.' }),
+  description: z.string().min(2, { message: "La descripción es muy corta." }),
+  amount: z.coerce
+    .number()
+    .positive({ message: "El monto debe ser positivo." }),
+  type: z.enum(["Income", "Expense"], {
+    required_error: "Debes seleccionar un tipo.",
+  }),
+  date: z.date({ required_error: "Debes seleccionar una fecha." }),
+  accountId: z.string({ required_error: "Debes seleccionar una cuenta." }),
+  categoryId: z.string({ required_error: "Debes seleccionar una categoría." }),
 });
 
-export function TransactionForm({ accounts, categories, onSuccess, transaction }: TransactionFormProps) {
+export function TransactionForm({
+  accounts,
+  categories,
+  onSuccess,
+  transaction,
+}: TransactionFormProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const isEditMode = !!transaction;
@@ -52,9 +70,9 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: '',
+      description: "",
       amount: 0,
-      type: 'Expense',
+      type: "Expense",
       date: new Date(),
     },
   });
@@ -67,66 +85,69 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
         date: new Date(transaction.date),
       });
     } else {
-        form.reset({
-            description: '',
-            amount: 0,
-            type: 'Expense',
-            date: new Date(),
-            accountId: undefined,
-            categoryId: undefined,
-        })
+      form.reset({
+        description: "",
+        amount: 0,
+        type: "Expense",
+        date: new Date(),
+        accountId: undefined,
+        categoryId: undefined,
+      });
     }
   }, [transaction, isEditMode, form]);
-  
-  const transactionType = form.watch('type');
 
-  const filteredCategories = categories.filter(c => c.type === transactionType);
+  const transactionType = form.watch("type");
+
+  const filteredCategories = categories.filter(
+    (c) => c.type === transactionType
+  );
 
   useEffect(() => {
-    if (!filteredCategories.some(c => c.id === form.getValues('categoryId'))) {
-        form.setValue('categoryId', '');
+    if (
+      !filteredCategories.some((c) => c.id === form.getValues("categoryId"))
+    ) {
+      form.setValue("categoryId", "");
     }
   }, [transactionType, filteredCategories, form]);
 
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user) {
-        toast({ variant: 'destructive', title: 'Error de autenticación' });
-        return;
+      toast({ variant: "destructive", title: "Error de autenticación" });
+      return;
     }
-    
-    try {
-        const dateISO = values.date.toISOString();
-        const transactionData = {
-            ...values,
-            user_id: user.userId,
-            date: dateISO,
-        }
 
-        if (isEditMode && transaction) {
-            await updateTransaction({
-                ...transaction,
-                ...transactionData,
-            });
-            toast({
-                title: '¡Transacción actualizada!',
-                description: 'Tu transacción ha sido modificada.',
-            });
-        } else {
-             await addTransaction(transactionData);
-            toast({
-              title: '¡Transacción agregada!',
-              description: 'Tu nueva transacción ha sido registrada.',
-            });
-        }
+    try {
+      const dateISO = values.date.toISOString();
+      const transactionData = {
+        ...values,
+        user_id: user.userId,
+        date: dateISO,
+      };
+
+      if (isEditMode && transaction) {
+        await updateTransaction({
+          ...transaction,
+          ...transactionData,
+        });
+        toast({
+          title: "¡Transacción actualizada!",
+          description: "Tu transacción ha sido modificada.",
+        });
+      } else {
+        await addTransaction(transactionData);
+        toast({
+          title: "¡Transacción agregada!",
+          description: "Tu nueva transacción ha sido registrada.",
+        });
+      }
 
       onSuccess();
     } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: 'Error al guardar',
-            description: 'Ocurrió un error al registrar tu transacción.',
-        });
+      toast({
+        variant: "destructive",
+        title: "Error al guardar",
+        description: "Ocurrió un error al registrar tu transacción.",
+      });
     }
   }
 
@@ -192,56 +213,56 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
           )}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField
+          <FormField
             control={form.control}
             name="accountId"
             render={({ field }) => (
-                <FormItem>
+              <FormItem>
                 <FormLabel>Cuenta</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
+                  <FormControl>
                     <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una cuenta" />
+                      <SelectValue placeholder="Selecciona una cuenta" />
                     </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                    {accounts.map(account => (
-                        <SelectItem key={account.id} value={account.id}>
+                  </FormControl>
+                  <SelectContent>
+                    {accounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
                         {account.name}
-                        </SelectItem>
+                      </SelectItem>
                     ))}
-                    </SelectContent>
+                  </SelectContent>
                 </Select>
                 <FormMessage />
-                </FormItem>
+              </FormItem>
             )}
-            />
-            <FormField
+          />
+          <FormField
             control={form.control}
             name="categoryId"
             render={({ field }) => (
-                <FormItem>
+              <FormItem>
                 <FormLabel>Categoría</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
+                  <FormControl>
                     <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una categoría" />
-                    </Trigger>
-                    </FormControl>
-                    <SelectContent>
-                    {filteredCategories.map(category => (
-                        <SelectItem key={category.id} value={category.id}>
+                      <SelectValue placeholder="Selecciona una categoría" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {filteredCategories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
                         {category.name}
-                        </SelectItem>
+                      </SelectItem>
                     ))}
-                    </SelectContent>
+                  </SelectContent>
                 </Select>
                 <FormMessage />
-                </FormItem>
+              </FormItem>
             )}
-            />
+          />
         </div>
-        
+
         <FormField
           control={form.control}
           name="date"
@@ -284,12 +305,9 @@ export function TransactionForm({ accounts, categories, onSuccess, transaction }
             </FormItem>
           )}
         />
-        
-        <Button
-          type="submit"
-          className="w-full"
-        >
-          {isEditMode ? 'Actualizar' : 'Guardar'} Transacción
+
+        <Button type="submit" className="w-full">
+          {isEditMode ? "Actualizar" : "Guardar"} Transacción
         </Button>
       </form>
     </Form>
