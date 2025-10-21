@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { format, addMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useAuth } from '@/hooks/use-auth';
+import { Calendar } from '@/components/ui/calendar';
 
 interface BudgetFormProps {
     onSuccess: () => void;
