@@ -1,3 +1,4 @@
+
 import type {
   Account,
   Budget,
@@ -70,12 +71,9 @@ export async function getAccounts(): Promise<Account[]> {
     throw new Error("Error al obtener cuentas");
   }
   const accountsFromDB: any[] = await response.json();
-  // Se obtienen las transacciones del usuario autenticado
   const transactions = await getTransactions();
 
-  // Calcular balance dinámico
   return accountsFromDB.map(acc => {
-    // Asegurarse que los valores iniciales son numéricos
     const initial_balance = Number(acc.initial_balance) || 0;
     const initial_debt = Number(acc.initial_debt) || 0;
 
@@ -91,13 +89,12 @@ export async function getAccounts(): Promise<Account[]> {
     } else {
       const debt = transactions.reduce((sum, t) => {
         if (t.accountId === acc.id) {
-          // Para TC, los gastos suman a la deuda, los pagos (ingresos a la TC) restan.
           if (t.type === 'Expense') return sum + Number(t.amount);
           if (t.type === 'Income') return sum - Number(t.amount);
         }
         return sum;
       }, initial_debt);
-      return { ...acc, debt: debt, credit_limit: Number(acc.credit_limit), initial_debt: initial_debt };
+      return { ...acc, debt: debt, credit_limit: Number(acc.credit_limit), initial_debt: initial_debt, balance: 0 };
     }
   });
 }
@@ -238,23 +235,28 @@ export async function deleteBudget(id: string) {
 
 // --- Dashboard ---
 
-// Dashboard data desde la API
 export async function getDashboardData() {
-  // Las llamadas ahora se hacen en paralelo para mejorar el rendimiento
-  // y se obtienen los datos del usuario autenticado
   const [accounts, transactions, categories] = await Promise.all([
     getAccounts(),
     getTransactions(),
     getCategories(),
   ]);
 
-  const totalIncome = transactions
-    .filter((t: any) => t.type === "Income")
-    .reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
 
-  const totalExpense = transactions
-    .filter((t: any) => t.type === "Expense")
-    .reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+  const monthlyTransactions = transactions.filter(t => {
+      const transactionDate = new Date(t.date);
+      return transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;
+  });
+
+  const totalIncome = monthlyTransactions
+    .filter((t) => t.type === "Income")
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+
+  const totalExpense = monthlyTransactions
+    .filter((t) => t.type === "Expense")
+    .reduce((sum, t) => sum + Number(t.amount), 0);
   
   const balance = accounts
     .filter((acc): acc is DebitAccount => acc.type !== "Credit Card")
@@ -264,7 +266,7 @@ export async function getDashboardData() {
     totalIncome,
     totalExpense,
     balance,
-    transactions,
+    transactions, // All transactions for yearly trend chart
     categories,
     accounts,
   };

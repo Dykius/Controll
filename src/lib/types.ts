@@ -23,6 +23,7 @@ export interface CreditAccount extends BaseAccount {
   closing_date: number;
   initial_debt: number;
   debt: number; // Campo calculado dinámicamente
+  balance: 0; // Credit cards don't contribute to patrimony
 }
 
 export type Account = DebitAccount | CreditAccount;

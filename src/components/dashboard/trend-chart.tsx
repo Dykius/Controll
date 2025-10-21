@@ -1,3 +1,4 @@
+
 "use client"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, ComposedChart } from "recharts"
 import {
@@ -33,19 +34,21 @@ export function TrendChart({ transactions }: TrendChartProps) {
         const currentYear = new Date().getFullYear();
 
         transactions.forEach(t => {
-            const transactionYear = new Date(t.date).getFullYear();
+            const transactionDate = new Date(t.date);
+            const transactionYear = transactionDate.getFullYear();
             if(transactionYear === currentYear) {
-                const monthIndex = new Date(t.date).getMonth();
+                const monthIndex = transactionDate.getMonth();
                 if (t.type === 'Income') {
-                    monthlyData[monthIndex].income += t.amount;
+                    monthlyData[monthIndex].income += Number(t.amount);
                 } else {
-                    monthlyData[monthIndex].expense += t.amount;
+                    monthlyData[monthIndex].expense += Number(t.amount);
                 }
             }
         });
 
         // show current month and previous 5 months
         const currentMonthIndex = new Date().getMonth();
+        // Return only up to the current month
         return monthlyData.slice(0, currentMonthIndex + 1);
 
     }, [transactions]);
@@ -53,7 +56,7 @@ export function TrendChart({ transactions }: TrendChartProps) {
   if (data.every(d => d.income === 0 && d.expense === 0)) {
     return (
       <div className="flex h-[300px] w-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">No hay datos de tendencia para mostrar.</p>
+        <p className="text-sm text-muted-foreground">No hay datos de tendencia para mostrar este año.</p>
       </div>
     );
   }
@@ -68,8 +71,8 @@ export function TrendChart({ transactions }: TrendChartProps) {
             <YAxis tickFormatter={(value) => formatNumberAsK(Number(value))} tickLine={false} tickMargin={10} axisLine={false} />
             <Tooltip cursor={false} content={<ChartTooltipContent formatter={(value) => formatCurrency(value as number)} />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="income" fill={chartConfig.income.color} radius={[4, 4, 0, 0]} />
-            <Bar dataKey="expense" fill={chartConfig.expense.color} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="income" fill={chartConfig.income.color} radius={[4, 4, 0, 0]} name="Ingresos"/>
+            <Bar dataKey="expense" fill={chartConfig.expense.color} radius={[4, 4, 0, 0]} name="Gastos"/>
           </BarChart>
         </ResponsiveContainer>
       </ChartContainer>

@@ -27,9 +27,9 @@ export default function DashboardPage() {
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
+        if (!user) return;
         setIsLoading(true);
         try {
-            // Ya no es necesario pasar el user.userId
             const dashboardData = await getDashboardData();
             setData(dashboardData);
         } catch (error) {
@@ -37,7 +37,7 @@ export default function DashboardPage() {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         if(user){
@@ -53,9 +53,19 @@ export default function DashboardPage() {
         return <div>Cargando...</div>;
     }
 
-    if (!data) {
-        // Podríamos mostrar un estado de bienvenida para nuevos usuarios
-        return <div>Bienvenido a Control+. Crea tu primera cuenta para empezar.</div>
+    if (!data || data.accounts.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Card className="card-glassmorphic text-center p-8 max-w-md">
+                    <CardHeader>
+                        <CardTitle className="font-headline text-2xl">¡Bienvenido a Control+!</CardTitle>
+                        <CardDescription className="text-base">
+                            Parece que todavía no tienes ninguna cuenta. ¡Crea una para empezar a gestionar tus finanzas!
+                        </CardDescription>
+                    </CardHeader>
+                </Card>
+            </div>
+        )
     }
 
     const { totalIncome, totalExpense, balance, transactions, categories, accounts } = data;
@@ -65,7 +75,7 @@ export default function DashboardPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Card className="card-glassmorphic rounded-xl">
                     <CardHeader>
-                        <CardTitle className="font-headline text-lg">Ingresos Totales</CardTitle>
+                        <CardTitle className="font-headline text-lg">Ingresos Totales (Mes)</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-3xl font-bold text-[hsl(var(--chart-1))]">{formatCurrency(totalIncome)}</p>
@@ -73,7 +83,7 @@ export default function DashboardPage() {
                 </Card>
                 <Card className="card-glassmorphic rounded-xl">
                     <CardHeader>
-                        <CardTitle className="font-headline text-lg">Gastos Totales</CardTitle>
+                        <CardTitle className="font-headline text-lg">Gastos Totales (Mes)</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-3xl font-bold text-[hsl(var(--chart-2))]">{formatCurrency(totalExpense)}</p>
@@ -81,7 +91,7 @@ export default function DashboardPage() {
                 </Card>
                 <Card className="card-glassmorphic rounded-xl">
                     <CardHeader>
-                        <CardTitle className="font-headline text-lg">Balance Actual</CardTitle>
+                        <CardTitle className="font-headline text-lg">Balance Total</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-3xl font-bold">{formatCurrency(balance)}</p>
@@ -102,7 +112,7 @@ export default function DashboardPage() {
                 <Card className="card-glassmorphic rounded-xl">
                     <CardHeader>
                         <CardTitle className="font-headline">Distribución de Gastos</CardTitle>
-                        <CardDescription>Cómo se distribuyen tus gastos por categoría.</CardDescription>
+                        <CardDescription>Cómo se distribuyen tus gastos por categoría este mes.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ExpensesChart transactions={transactions} categories={categories} />

@@ -1,3 +1,4 @@
+
 "use client"
 import { Pie, PieChart, ResponsiveContainer, Tooltip, Legend, Cell } from "recharts"
 import {
@@ -18,26 +19,24 @@ interface ExpensesChartProps {
 export function ExpensesChart({ transactions, categories }: ExpensesChartProps) {
   const chartData = useMemo(() => {
     const expenseCategories = categories.filter(c => c.type === 'Expense');
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
     
     return expenseCategories
       .map((category, index) => {
         const total = transactions
-          .filter(t => t.categoryId === category.id && t.type === 'Expense')
-          .reduce((sum, t) => sum + t.amount, 0);
+          .filter(t => {
+            const transactionDate = new Date(t.date);
+            return t.categoryId === category.id && 
+                   t.type === 'Expense' &&
+                   transactionDate.getMonth() === currentMonth &&
+                   transactionDate.getFullYear() === currentYear;
+          })
+          .reduce((sum, t) => sum + Number(t.amount), 0);
         
-        // Base colors from CSS variables
         const baseColorsCount = 5;
         const colorIndex = (index % baseColorsCount) + 1;
-        let color;
-
-        if (index < baseColorsCount) {
-            // Use predefined CSS variables for the first 5 categories
-            color = `hsl(var(--chart-${colorIndex}))`;
-        } else {
-            // Generate a dynamic color for additional categories
-            const hue = (index * 360 / (expenseCategories.length > baseColorsCount ? expenseCategories.length : 8)) % 360;
-            color = `hsl(${hue}, 70%, 50%)`;
-        }
+        let color = `hsl(var(--chart-${colorIndex}))`;
 
         return { 
           name: category.name, 
@@ -63,7 +62,7 @@ export function ExpensesChart({ transactions, categories }: ExpensesChartProps) 
   if (chartData.length === 0) {
     return (
       <div className="flex h-[300px] w-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">No hay datos de gastos para mostrar.</p>
+        <p className="text-sm text-muted-foreground">No hay datos de gastos para mostrar este mes.</p>
       </div>
     );
   }
@@ -78,8 +77,8 @@ export function ExpensesChart({ transactions, categories }: ExpensesChartProps) 
                     content={<ChartTooltipContent hideLabel formatter={(value) => formatCurrency(value as number)} />}
                 />
                 <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90}>
-                     {chartData.map((entry) => (
-                        <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                     {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                 </Pie>
                 <ChartLegend content={<ChartLegendContent />} />
