@@ -1,7 +1,7 @@
 
 "use client";
 
-import { getTransactions, getAccounts, getCategories } from "@/lib/data-service";
+import { getAppData } from "@/lib/data-service";
 import { TransactionsClient } from "./transactions-client";
 import { useEffect, useState, useCallback } from "react";
 import type { Transaction, Account, Category } from "@/lib/types";
@@ -18,15 +18,10 @@ export default function TransactionsPage() {
     if (!user) return;
     setIsLoading(true);
     try {
-      // Ya no es necesario pasar el user.userId
-      const [transactionsData, accountsData, categoriesData] = await Promise.all([
-        getTransactions(),
-        getAccounts(),
-        getCategories()
-      ]);
-      setTransactions(transactionsData);
-      setAccounts(accountsData);
-      setCategories(categoriesData);
+      const { transactions, accounts, categories } = await getAppData();
+      setTransactions(transactions);
+      setAccounts(accounts);
+      setCategories(categories);
     } catch (error) {
       console.error("Failed to refresh data:", error);
     } finally {
@@ -42,6 +37,7 @@ export default function TransactionsPage() {
         setIsLoading(false);
         setTransactions([]);
         setAccounts([]);
+        setCategories([]);
     }
   }, [user, isAuthLoading, refreshData]);
   

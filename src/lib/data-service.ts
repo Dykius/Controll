@@ -70,34 +70,9 @@ export async function getAccounts(): Promise<Account[]> {
   if (!response.ok) {
     throw new Error("Error al obtener cuentas");
   }
-  const accountsFromDB: any[] = await response.json();
-  const transactions = await getTransactions();
-
-  return accountsFromDB.map(acc => {
-    const initial_balance = Number(acc.initial_balance) || 0;
-    const initial_debt = Number(acc.initial_debt) || 0;
-
-    if (acc.type !== 'Credit Card') {
-      const balance = transactions.reduce((sum, t) => {
-        if (t.accountId === acc.id) {
-          if (t.type === 'Income') return sum + Number(t.amount);
-          if (t.type === 'Expense') return sum - Number(t.amount);
-        }
-        return sum;
-      }, initial_balance);
-      return { ...acc, balance: balance, initial_balance: initial_balance };
-    } else {
-      const debt = transactions.reduce((sum, t) => {
-        if (t.accountId === acc.id) {
-          if (t.type === 'Expense') return sum + Number(t.amount);
-          if (t.type === 'Income') return sum - Number(t.amount);
-        }
-        return sum;
-      }, initial_debt);
-      return { ...acc, debt: debt, credit_limit: Number(acc.credit_limit), initial_debt: initial_debt, balance: 0 };
-    }
-  });
+  return await response.json();
 }
+
 
 // Crear cuenta
 export async function addAccount(accountData: Omit<Account, 'id' | 'balance' | 'debt' | 'user_id'>) {
@@ -234,14 +209,37 @@ export async function deleteBudget(id: string) {
 }
 
 // --- Dashboard ---
+// Obtiene todos los datos necesarios para las vistas.
 
-export async function getDashboardData() {
-  const [accounts, transactions, categories] = await Promise.all([
+export async function getAppData() {
+  const [accounts, transactions, categories, budgets] = await Promise.all([
     getAccounts(),
     getTransactions(),
     getCategories(),
+    getBudgets(),
   ]);
 
+  // Calcular balances dinámicamente
+  const accountsWithBalances = accounts.map(acc => {
+    if (acc.type === 'Credit Card') {
+      const debt = transactions.reduce((sum, t) => {
+        if (t.accountId === acc.id) {
+          return t.type === 'Expense' ? sum + Number(t.amount) : sum - Number(t.amount);
+        }
+        return sum;
+      }, Number(acc.initial_debt) || 0);
+      return { ...acc, debt, balance: 0 };
+    } else {
+      const balance = transactions.reduce((sum, t) => {
+        if (t.accountId === acc.id) {
+          return t.type === 'Income' ? sum + Number(t.amount) : sum - Number(t.amount);
+        }
+        return sum;
+      }, Number(acc.initial_balance) || 0);
+      return { ...acc, balance };
+    }
+  });
+  
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
@@ -258,16 +256,19 @@ export async function getDashboardData() {
     .filter((t) => t.type === "Expense")
     .reduce((sum, t) => sum + Number(t.amount), 0);
   
-  const balance = accounts
+  const totalBalance = accountsWithBalances
     .filter((acc): acc is DebitAccount => acc.type !== "Credit Card")
     .reduce((sum, acc) => sum + acc.balance, 0);
 
   return {
-    totalIncome,
-    totalExpense,
-    balance,
-    transactions, // All transactions for yearly trend chart
+    accounts: accountsWithBalances,
+    transactions, // All transactions for trend chart
     categories,
-    accounts,
+    budgets,
+    monthlySummary: {
+        totalIncome,
+        totalExpense,
+        totalBalance,
+    }
   };
 }

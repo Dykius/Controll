@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { getBudgets, getCategories, getTransactions, deleteBudget } from "@/lib/data-service";
+import { getAppData, deleteBudget } from "@/lib/data-service";
 import { formatCurrency, getBudgetStatusColor } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, MoreVertical, Edit, Trash2, Building, ShoppingCart, Home, Car, Ticket, Laptop, Lightbulb, HeartPulse } from "lucide-react";
@@ -57,14 +57,10 @@ export default function BudgetsPage() {
     if (!user) return;
     setIsLoading(true);
     try {
-      const [budgetsData, categoriesData, transactionsData] = await Promise.all([
-        getBudgets(),
-        getCategories(),
-        getTransactions()
-      ]);
-      setBudgets(budgetsData);
-      setCategories(categoriesData);
-      setTransactions(transactionsData);
+      const { budgets, categories, transactions } = await getAppData();
+      setBudgets(budgets);
+      setCategories(categories);
+      setTransactions(transactions);
     } catch (error) {
       console.error("Failed to refresh data:", error);
       toast({ variant: 'destructive', title: 'Error', description: 'No se pudieron cargar los datos.' });
@@ -81,6 +77,7 @@ export default function BudgetsPage() {
         setIsLoading(false);
         setBudgets([]);
         setTransactions([]);
+        setCategories([]);
     }
   }, [user, isAuthLoading, refreshData]);
 
@@ -92,7 +89,11 @@ export default function BudgetsPage() {
     const data = monthlyBudgets.map((budget) => {
       const category = categories.find(c => c.id === budget.categoryId);
       const spent = transactions
-        .filter(t => t.categoryId === budget.categoryId && t.type === 'Expense' && new Date(t.date).toISOString().startsWith(monthStr))
+        .filter(t => 
+            t.categoryId === budget.categoryId && 
+            t.type === 'Expense' && 
+            new Date(t.date).toLocaleString('sv-SE', { timeZone: 'UTC' }).startsWith(monthStr)
+        )
         .reduce((sum, t) => sum + Number(t.amount), 0);
       
       const progress = budget.amount > 0 ? Math.min((spent / Number(budget.amount)) * 100, 100) : 0;

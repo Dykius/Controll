@@ -6,32 +6,35 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { ExpensesChart } from "@/components/dashboard/expenses-chart";
 import { formatCurrency } from "@/lib/utils";
-import { getDashboardData } from "@/lib/data-service";
+import { getAppData } from "@/lib/data-service";
 import { useState, useEffect, useCallback } from "react";
-import type { Account, Category, Transaction } from "@/lib/types";
+import type { Account, Category, Transaction, Budget } from "@/lib/types";
 import { useAuth } from "@/hooks/use-auth";
 
-type DashboardData = {
-    totalIncome: number;
-    totalExpense: number;
-    balance: number;
+type AppData = {
+    accounts: Account[];
     transactions: Transaction[];
     categories: Category[];
-    accounts: Account[];
+    budgets: Budget[];
+    monthlySummary: {
+        totalIncome: number;
+        totalExpense: number;
+        totalBalance: number;
+    }
 };
 
 
 export default function DashboardPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
-    const [data, setData] = useState<DashboardData | null>(null);
+    const [data, setData] = useState<AppData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
         if (!user) return;
         setIsLoading(true);
         try {
-            const dashboardData = await getDashboardData();
-            setData(dashboardData);
+            const appData = await getAppData();
+            setData(appData);
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
         } finally {
@@ -68,7 +71,7 @@ export default function DashboardPage() {
         )
     }
 
-    const { totalIncome, totalExpense, balance, transactions, categories, accounts } = data;
+    const { monthlySummary, transactions, categories, accounts } = data;
     
     return (
         <div className="space-y-6">
@@ -78,7 +81,7 @@ export default function DashboardPage() {
                         <CardTitle className="font-headline text-lg">Ingresos Totales (Mes)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-3xl font-bold text-[hsl(var(--chart-1))]">{formatCurrency(totalIncome)}</p>
+                        <p className="text-3xl font-bold text-[hsl(var(--chart-1))]">{formatCurrency(monthlySummary.totalIncome)}</p>
                     </CardContent>
                 </Card>
                 <Card className="card-glassmorphic rounded-xl">
@@ -86,7 +89,7 @@ export default function DashboardPage() {
                         <CardTitle className="font-headline text-lg">Gastos Totales (Mes)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-3xl font-bold text-[hsl(var(--chart-2))]">{formatCurrency(totalExpense)}</p>
+                        <p className="text-3xl font-bold text-[hsl(var(--chart-2))]">{formatCurrency(monthlySummary.totalExpense)}</p>
                     </CardContent>
                 </Card>
                 <Card className="card-glassmorphic rounded-xl">
@@ -94,7 +97,7 @@ export default function DashboardPage() {
                         <CardTitle className="font-headline text-lg">Balance Total</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-3xl font-bold">{formatCurrency(balance)}</p>
+                        <p className="text-3xl font-bold">{formatCurrency(monthlySummary.totalBalance)}</p>
                     </CardContent>
                 </Card>
             </div>

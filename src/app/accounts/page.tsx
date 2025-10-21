@@ -1,6 +1,6 @@
 
 "use client";
-import { getAccounts } from "@/lib/data-service";
+import { getAppData } from "@/lib/data-service";
 import { AccountsClient } from "./accounts-client";
 import type { Account } from "@/lib/types";
 import { useEffect, useState, useCallback } from "react";
@@ -15,9 +15,8 @@ export default function AccountsPage() {
     if (!user) return;
     setIsLoading(true);
     try {
-      // Ya no es necesario pasar el user.userId
-      const accountsData = await getAccounts();
-      setData(accountsData);
+      const { accounts } = await getAppData();
+      setData(accounts);
     } catch (error) {
       console.error("Failed to fetch accounts:", error);
     } finally {

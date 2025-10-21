@@ -119,6 +119,10 @@ export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json();
     // Verify that the account belongs to the user before deleting
+    const [transactions]: any = await pool.query("SELECT id FROM transactions WHERE account_id = ? AND user_id = ?", [id, user_id]);
+    if (transactions.length > 0) {
+      return NextResponse.json({ error: "No se puede eliminar una cuenta con transacciones asociadas." }, { status: 400 });
+    }
     await pool.query("DELETE FROM accounts WHERE id = ? AND user_id = ?", [id, user_id]);
     return NextResponse.json({ message: "Cuenta eliminada" });
   } catch (error: any) {

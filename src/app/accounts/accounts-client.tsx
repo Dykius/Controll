@@ -137,11 +137,11 @@ export const AccountsClient: React.FC<AccountsClientProps> = ({ data, onAccountC
                     title: "Cuenta eliminada",
                     description: "La cuenta ha sido eliminada exitosamente."
                 })
-            } catch (error) {
+            } catch (error: any) {
                  toast({
                     variant: 'destructive',
                     title: "Error al eliminar",
-                    description: "No se pudo eliminar la cuenta."
+                    description: error.message || "No se pudo eliminar la cuenta."
                 })
             }
         }
