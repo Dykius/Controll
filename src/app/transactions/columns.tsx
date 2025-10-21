@@ -12,13 +12,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, ArrowDownUp, Building, ShoppingCart, Home, Car, Ticket, Laptop, Lightbulb, HeartPulse } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, ArrowDownUp, Briefcase, ShoppingCart, Home, Car, Ticket, Laptop, Lightbulb, HeartPulse } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 
 const iconMap: { [key: string]: React.ReactNode } = {
-    Briefcase: <Building className="h-4 w-4" />,
+    Briefcase: <Briefcase className="h-4 w-4" />,
     ShoppingCart: <ShoppingCart className="h-4 w-4" />,
     Home: <Home className="h-4 w-4" />,
     Car: <Car className="h-4 w-4" />,

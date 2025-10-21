@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { getAppData, deleteBudget } from "@/lib/data-service";
 import { formatCurrency, getBudgetStatusColor } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreVertical, Edit, Trash2, Building, ShoppingCart, Home, Car, Ticket, Laptop, Lightbulb, HeartPulse } from "lucide-react";
+import { PlusCircle, MoreVertical, Edit, Trash2, Briefcase, ShoppingCart, Home, Car, Ticket, Laptop, Lightbulb, HeartPulse } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 
 const iconMap: { [key: string]: React.ReactNode } = {
-    Briefcase: <Building className="h-6 w-6" />,
+    Briefcase: <Briefcase className="h-6 w-6" />,
     ShoppingCart: <ShoppingCart className="h-6 w-6" />,
     Home: <Home className="h-6 w-6" />,
     Car: <Car className="h-6 w-6" />,
@@ -92,7 +92,7 @@ export default function BudgetsPage() {
         .filter(t => 
             t.categoryId === budget.categoryId && 
             t.type === 'Expense' && 
-            new Date(t.date).toLocaleString('sv-SE', { timeZone: 'UTC' }).startsWith(monthStr)
+            new Date(t.date).toISOString().startsWith(monthStr)
         )
         .reduce((sum, t) => sum + Number(t.amount), 0);
       

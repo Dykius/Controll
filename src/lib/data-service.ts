@@ -111,8 +111,9 @@ export async function deleteAccount(id: string) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id }),
   });
-  if (!response.ok) {
-    throw new Error("Error al eliminar cuenta");
+   if (!response.ok) {
+    const errorBody = await response.json();
+    throw new Error(errorBody.error || "Error al eliminar cuenta");
   }
   return await response.json();
 }

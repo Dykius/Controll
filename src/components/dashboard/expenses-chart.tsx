@@ -1,6 +1,6 @@
 
 "use client"
-import { Pie, PieChart, ResponsiveContainer, Tooltip, Legend, Cell } from "recharts"
+import { Pie, PieChart, ResponsiveContainer, Tooltip, Cell } from "recharts"
 import {
   ChartContainer,
   ChartTooltipContent,
@@ -76,12 +76,12 @@ export function ExpensesChart({ transactions, categories }: ExpensesChartProps) 
                     cursor={false}
                     content={<ChartTooltipContent hideLabel formatter={(value) => formatCurrency(value as number)} />}
                 />
-                <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90}>
+                <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                      {chartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                 </Pie>
-                <ChartLegend content={<ChartLegendContent />} />
+                <ChartLegend content={<ChartLegendContent nameKey="name" />} />
             </PieChart>
         </ResponsiveContainer>
       </ChartContainer>
