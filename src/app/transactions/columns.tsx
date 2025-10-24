@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -12,21 +11,34 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, ArrowDownUp, Briefcase, ShoppingCart, Home, Car, Ticket, Laptop, Lightbulb, HeartPulse } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  ArrowDownUp,
+  Briefcase,
+  ShoppingCart,
+  Home,
+  Car,
+  Ticket,
+  Laptop,
+  Lightbulb,
+  HeartPulse,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 
 const iconMap: { [key: string]: React.ReactNode } = {
-    Briefcase: <Briefcase className="h-4 w-4" />,
-    ShoppingCart: <ShoppingCart className="h-4 w-4" />,
-    Home: <Home className="h-4 w-4" />,
-    Car: <Car className="h-4 w-4" />,
-    Ticket: <Ticket className="h-4 w-4" />,
-    Laptop: <Laptop className="h-4 w-4" />,
-    Lightbulb: <Lightbulb className="h-4 w-4" />,
-    HeartPulse: <HeartPulse className="h-4 w-4" />,
-    Default: <div className="h-4 w-4" />
+  Briefcase: <Briefcase className="h-4 w-4" />,
+  ShoppingCart: <ShoppingCart className="h-4 w-4" />,
+  Home: <Home className="h-4 w-4" />,
+  Car: <Car className="h-4 w-4" />,
+  Ticket: <Ticket className="h-4 w-4" />,
+  Laptop: <Laptop className="h-4 w-4" />,
+  Lightbulb: <Lightbulb className="h-4 w-4" />,
+  HeartPulse: <HeartPulse className="h-4 w-4" />,
+  Default: <div className="h-4 w-4" />,
 };
 
 type ActionCellProps = {
@@ -79,7 +91,7 @@ export const getColumns = (
       return (
         <div className="flex items-center gap-3">
           <div className="bg-secondary p-2 rounded-full h-10 w-10 flex items-center justify-center">
-            {iconMap[category?.icon || 'Default']}
+            {iconMap[category?.icon || "Default"]}
           </div>
           <div>
             <div className="font-medium">{row.getValue("description")}</div>
